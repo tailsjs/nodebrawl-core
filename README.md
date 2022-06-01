@@ -3,7 +3,7 @@ The world's first Brawl Stars private server core written in NodeJS
 
 ## Requirements
 * [NodeJS](https://nodejs.org/)
-* Brains
+* Brain
 
 ## Setting up
 1. Download/clone a repository

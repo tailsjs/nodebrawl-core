@@ -1,0 +1,16 @@
+{
+  "name": "nodebrawl-core",
+  "version": "1.0.0",
+  "description": "The world's first Brawl Stars private server core written in NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "tailsjs",
+  "license": "ISC",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "net": "^1.0.2"
+  }
+}

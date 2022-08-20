@@ -4,11 +4,19 @@ const MessageFactory = require("./Packets/MessageFactory");
 const server = new net.Server();
 const Messages = new MessageFactory();
 
+const PORT = 9339;
+
 
 server.on("connection", async(client) => {
-    console.log("A wild connection appeared!");
+    client.log = function(text){
+        return console.log(`[${this.remoteAddress.split(":").slice(-1)}] >> ${text}`)
+    };
+
+    client.log(`A wild connection appeard!`);
     const packets = Messages.getPackets();
     const packetizer = new Packetizer();
+
+    
     
     client.on('data', async(chunk) => {
         packetizer.packetize(chunk, (packet) => {
@@ -21,29 +29,29 @@ server.on("connection", async(client) => {
             };
             if(packets.indexOf(String(message.id)) != -1){
                 try{
-                    console.log(`Gotcha ${message.id} packet!`);
+                    client.log(`Gotcha ${message.id} packet!`);
                     Messages.handle(message.id)(message)
                 }catch(e){
                     console.log(e)
                 }
             }else{
-                console.log(`Gotcha undefined ${message.id} packet!`)
+                client.log(`Gotcha undefined ${message.id} packet!`)
             }
         })
     });
 
     client.on('end', async () => {
-        return console.error('Client disconnected.')
+        return client.log(`Client disconnected.`)
     });
 
     client.on('error', async error => {
         try {
-            console.error('A wild error!');
+            client.log(`A wild error!`);
             console.log(error);
             client.destroy()
         } catch (e) { }
     })
 });
 
-server.once('listening', () => console.log('Server started!'));
-server.listen(9339)
+server.once('listening', () => console.log(`Server started on ${PORT} port!`));
+server.listen(PORT)

@@ -9,7 +9,7 @@ class Messaging{
         header.writeUIntBE(message.buffer.buffer.length, 2, 3);
         header.writeUInt16BE(message.version, 5);
         this.client.write(Buffer.concat([header, message.buffer.buffer]));
-        console.log(`Packet ${message.id} was sent.`)
+        this.client.log(`Packet ${message.id} was sent.`)
     }
 };
 

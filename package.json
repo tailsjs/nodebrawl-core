@@ -1,6 +1,6 @@
 {
   "name": "nodebrawl-core",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "The world's first Brawl Stars private server core written in NodeJS",
   "main": "index.js",
   "scripts": {

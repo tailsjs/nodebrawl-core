@@ -1,5 +1,8 @@
 # nodebrawl-core
-The world's first open source Brawl Stars private server core written in NodeJS
+The world's first open source Brawl Stars private server core written on JavaScript. <br>
+*[Now uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Classes</a> instead of <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">Functions!</a>]*
+
+* [Русский язык](/README-ru.md)
 
 ## Requirements
 * [NodeJS](https://nodejs.org/)
@@ -10,7 +13,7 @@ The world's first open source Brawl Stars private server core written in NodeJS
 2. Type in console `npm install`
 3. `node index`
 
-* Now you can connect to your server through any brawl stars client with frida injection.
+* Now you can connect to your server through any Brawl Stars client with Frida Injection.
 
 ## Why game isn't loading?
 Because it's core. You need implement all messages/packets and logic by yourself.

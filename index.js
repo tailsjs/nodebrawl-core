@@ -1,11 +1,10 @@
 const net = require("net");
 const Packetizer = require("./ByteStream/packetizer");
-const MessageFactory = require("./Packets/MessageFactory");
+const MessageFactory = require("./Protocol/MessageFactory");
 const server = new net.Server();
 const Messages = new MessageFactory();
 
 const PORT = 9339;
-
 
 server.on("connection", async(client) => {
     client.log = function(text){
@@ -16,8 +15,7 @@ server.on("connection", async(client) => {
     const packets = Messages.getPackets();
     const packetizer = new Packetizer();
 
-    
-    
+
     client.on('data', async(chunk) => {
         packetizer.packetize(chunk, (packet) => {
             let message = {
@@ -29,8 +27,13 @@ server.on("connection", async(client) => {
             };
             if(packets.indexOf(String(message.id)) != -1){
                 try{
-                    client.log(`Gotcha ${message.id} packet!`);
-                    Messages.handle(message.id)(message)
+                    const packet = new (Messages.handle(message.id))(client, message.payload);
+
+                    client.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `);
+                    
+                    packet.decode();
+                    packet.process()
+
                 }catch(e){
                     console.log(e)
                 }
@@ -51,7 +54,9 @@ server.on("connection", async(client) => {
             client.destroy()
         } catch (e) { }
     })
-});
+
+})
+
 
 server.once('listening', () => console.log(`Server started on ${PORT} port!`));
 server.listen(PORT)

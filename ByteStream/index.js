@@ -187,6 +187,10 @@ class ByteStream{
         header.writeUInt16BE(this.version, 5);
         client.write(Buffer.concat([header, this.buffer]));
         client.log(`Packet ${this.id} (${this.constructor.name}) was sent.`)
+        this.buffer = Buffer.alloc(0)
+        this.bitOffset = 0
+        this.offset = 0
+        this.length = 0  
     }
 }
 

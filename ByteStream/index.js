@@ -51,7 +51,7 @@ class ByteStream{
 
         if (length > 0 && length < 90000) {
             let stringBytes = this.buffer.slice(this.offset, this.offset+length);
-            let string = ByteArray.bytesToString(stringBytes);
+            let string = stringBytes.toString("utf8");
             this.offset += length;
             return string;
         }
@@ -140,10 +140,11 @@ class ByteStream{
             return;
         }
 
-        this.writeInt(value.length);
+        
         let buf = Buffer.from(value, 'utf8');
+        this.writeInt(buf.length);
         this.buffer = Buffer.concat([this.buffer, buf]);
-        this.offset += value.length;
+        this.offset += buf.length;
     }
 
     writeLongLong(value) {

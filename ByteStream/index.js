@@ -49,13 +49,13 @@ class ByteStream{
     readString() {
         let length = this.readInt();
 
-        if (length > 0 || length < 90000) {
+        if (length > 0 && length < 90000) {
             let stringBytes = this.buffer.slice(this.offset, this.offset+length);
             let string = ByteArray.bytesToString(stringBytes);
             this.offset += length;
             return string;
         }
-        return null;
+        return "";
     }
     
     /** idk it works or not

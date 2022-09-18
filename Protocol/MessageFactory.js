@@ -1,28 +1,27 @@
-const fs = require("fs");
+const fs = require('fs')
 
-class MessageFactory{
-    constructor(){
-        this.packets = {}
+class MessageFactory {
+  constructor () {
+    this.packets = {}
 
-        fs.readdir('./Protocol/Messages/Client', (err, files) => {
-            if(err)console.log(err)
-            files.forEach(e => {
-                let Packet = require(`./Messages/Client/${e.replace(".js", "")}`);
-                let packetClass = new Packet()
+    fs.readdir('./Protocol/Messages/Client', (err, files) => {
+      if (err)console.log(err)
+      files.forEach(e => {
+        const Packet = require(`./Messages/Client/${e.replace('.js', '')}`)
+        const packetClass = new Packet()
 
-                this.packets[packetClass.id] = Packet 
-            })
-        })
-    }
+        this.packets[packetClass.id] = Packet
+      })
+    })
+  }
 
-    handle(id){
-        return this.packets[id]
-    };
+  handle (id) {
+    return this.packets[id]
+  };
 
-    getPackets(){
-        return Object.keys(this.packets)
-    }
-
+  getPackets () {
+    return Object.keys(this.packets)
+  }
 }
 
 module.exports = MessageFactory

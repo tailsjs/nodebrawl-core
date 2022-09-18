@@ -1,23 +1,23 @@
-const ByteStream = require("../ByteStream");
+const ByteStream = require('../ByteStream')
 
-class PiranhaMessage extends ByteStream{
-    constructor(bytes){
-        super(bytes);
-        this.id = 0;
-        this.version = 0
-    }
+class PiranhaMessage extends ByteStream {
+  constructor (bytes) {
+    super(bytes)
+    this.id = 0
+    this.version = 0
+  }
 
-    encode(){
-    
-    };
+  encode () {
 
-    decode(){
+  };
 
-    };
+  decode () {
 
-    process(){
+  };
 
-    }
+  process () {
+
+  }
 }
 
 module.exports = PiranhaMessage

@@ -1,5 +1,5 @@
 const PiranhaMessage = require('../../PiranhaMessage')
-const ServerHelloMessage = new (require('../Server/ServerHelloMessage'))()
+const ServerHelloMessage = require('../Server/ServerHelloMessage')
 
 class ClientHelloMessage extends PiranhaMessage {
   constructor (client, bytes) {
@@ -14,7 +14,7 @@ class ClientHelloMessage extends PiranhaMessage {
   }
 
   process () {
-    ServerHelloMessage.send(this.client)
+    new ServerHelloMessage(this.client).send()
   }
 }
 

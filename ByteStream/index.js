@@ -180,18 +180,14 @@ class ByteStream {
     }
   }
 
-  send (client) {
+  send () {
     this.encode()
     const header = Buffer.alloc(7)
     header.writeUInt16BE(this.id, 0)
     header.writeUIntBE(this.buffer.length, 2, 3)
     header.writeUInt16BE(this.version, 5)
-    client.write(Buffer.concat([header, this.buffer]))
-    client.log(`Packet ${this.id} (${this.constructor.name}) was sent.`)
-    this.buffer = Buffer.alloc(0)
-    this.bitOffset = 0
-    this.offset = 0
-    this.length = 0
+    this.client.write(Buffer.concat([header, this.buffer]))
+    this.client.log(`Packet ${this.id} (${this.constructor.name}) was sent.`)
   }
 }
 

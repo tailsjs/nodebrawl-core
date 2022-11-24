@@ -1,9 +1,10 @@
 const PiranhaMessage = require('../../PiranhaMessage')
 
 class ServerHelloMessage extends PiranhaMessage {
-  constructor (client, bytes) {
-    super(client, bytes)
+  constructor (client) {
+    super()
     this.id = 20100
+    this.client = client
     this.version = 0
   }
 

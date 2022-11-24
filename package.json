@@ -1,7 +1,7 @@
 {
   "name": "nodebrawl-core",
-  "version": "2.0.0",
-  "description": "The world's first Brawl Stars private server core written in NodeJS",
+  "version": "2.1.0",
+  "description": "The world's first open source Brawl Stars private server core written on JavaScript.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

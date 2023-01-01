@@ -59,8 +59,6 @@ class ByteStream {
     return ''
   }
 
-  /** idk it works or not
-     */
   readVInt () {
     let result = 0,
       shift = 0,
@@ -82,6 +80,19 @@ class ByteStream {
     } while (true)
 
     return (result >> 1) ^ (-(result & 1))
+  }
+
+  readDataReference () {
+    return [ this.readVInt(), this.readVInt() ] 
+  }
+
+  writeDataReference (a1, a2) {
+    if(a1 == 0){
+      this.writeVInt(0)
+    }else{
+      this.writeVInt(a1)
+      this.writeVInt(a2)
+    }
   }
 
   writeVInt (value) {
@@ -146,9 +157,27 @@ class ByteStream {
     this.offset += buf.length
   }
 
+  writeStringReference = this.writeString
+
   writeLongLong (value) {
     this.writeInt(value >> 32)
     this.writeInt(value)
+  }
+
+  writeLogicLong (a1, a2) {
+    this.writeVInt(a1)
+    this.writeVInt(a2)
+  }
+
+  readLogicLong = this.readDataReference
+
+  writeLong (a1, a2) {
+    this.writeInt(a1)
+    this.writeInt(a2)
+  }
+
+  readLong () {
+    return [ this.readInt(), this.readInt() ]
   }
 
   writeByte (value) {
@@ -169,6 +198,7 @@ class ByteStream {
 
     this.writeInt(-1)
   }
+
 
   ensureCapacity (capacity) {
     const bufferLength = this.buffer.length

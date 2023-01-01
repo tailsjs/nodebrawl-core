@@ -1,5 +1,4 @@
 const net = require('net')
-const Packetizer = require('./ByteStream/packetizer')
 const MessageFactory = require('./Protocol/MessageFactory')
 const server = new net.Server()
 const Messages = new MessageFactory()
@@ -13,32 +12,29 @@ server.on('connection', async (client) => {
 
   client.log('A wild connection appeard!')
   const packets = Messages.getPackets()
-  const packetizer = new Packetizer()
 
-  client.on('data', async (chunk) => {
-    packetizer.packetize(chunk, (packet) => {
-      const message = {
-        id: packet.readUInt16BE(0),
-        len: packet.readUIntBE(2, 3),
-        version: packet.readUInt16BE(5),
-        payload: packet.slice(7, this.len),
-        client,
+  client.on('data', async (packet) => {
+    const message = {
+      id: packet.readUInt16BE(0),
+      len: packet.readUIntBE(2, 3),
+      version: packet.readUInt16BE(5),
+      payload: packet.slice(7, this.len),
+      client,
+    }
+    if (packets.indexOf(String(message.id)) !== -1) {
+      try {
+        const packet = new (Messages.handle(message.id))(client, message.payload)
+
+        client.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
+
+        packet.decode()
+        packet.process()
+      } catch (e) {
+        console.log(e)
       }
-      if (packets.indexOf(String(message.id)) !== -1) {
-        try {
-          const packet = new (Messages.handle(message.id))(client, message.payload)
-
-          client.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
-
-          packet.decode()
-          packet.process()
-        } catch (e) {
-          console.log(e)
-        }
-      } else {
-        client.log(`Gotcha undefined ${message.id} packet!`)
-      }
-    })
+    } else {
+      client.log(`Gotcha undefined ${message.id} packet!`)
+    }
   })
 
   client.on('end', async () => {
@@ -56,3 +52,8 @@ server.on('connection', async (client) => {
 
 server.once('listening', () => console.log(`Server started on ${PORT} port!`))
 server.listen(PORT)
+
+
+process.on("uncaughtException", e => console.log(e));
+
+process.on("unhandledRejection", e => console.log(e));

@@ -83,7 +83,8 @@ class ByteStream {
   }
 
   readDataReference () {
-    return [ this.readVInt(), this.readVInt() ] 
+    const x = this.readVInt();
+    return [ x, x === 0 ? 0 : this.readVInt() ] 
   }
 
   writeDataReference (a1, a2) {

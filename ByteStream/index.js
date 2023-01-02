@@ -170,7 +170,9 @@ class ByteStream {
     this.writeVInt(a2)
   }
 
-  readLogicLong = this.readDataReference
+  readLogicLong () {
+    return [ this.readVInt(), this.readVInt() ] 
+  }
 
   writeLong (a1, a2) {
     this.writeInt(a1)

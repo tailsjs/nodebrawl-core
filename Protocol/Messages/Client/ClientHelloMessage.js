@@ -2,19 +2,19 @@ const PiranhaMessage = require('../../PiranhaMessage')
 const ServerHelloMessage = require('../Server/ServerHelloMessage')
 
 class ClientHelloMessage extends PiranhaMessage {
-  constructor (client, bytes) {
+  constructor (bytes, client) {
     super(bytes)
     this.client = client
     this.id = 10100
     this.version = 0
   }
 
-  decode () {
+  async decode () {
     // this.readInt()
   }
 
-  process () {
-    new ServerHelloMessage(this.client).send()
+  async process () {
+    await new ServerHelloMessage(this.client).send()
   }
 }
 

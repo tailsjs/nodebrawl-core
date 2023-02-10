@@ -11,7 +11,8 @@ server.on('connection', async (client) => {
   }
 
   client.log('A wild connection appeard!')
-  const packets = Messages.getPackets()
+  
+  const packets = Messages.getPackets();
 
   client.on('data', async (packet) => {
     const message = {
@@ -23,12 +24,12 @@ server.on('connection', async (client) => {
     }
     if (packets.indexOf(String(message.id)) !== -1) {
       try {
-        const packet = new (Messages.handle(message.id))(client, message.payload)
+        const packet = new (Messages.handle(message.id))(message.payload, client)
 
         client.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
 
-        packet.decode()
-        packet.process()
+        await packet.decode()
+        await packet.process()
       } catch (e) {
         console.log(e)
       }

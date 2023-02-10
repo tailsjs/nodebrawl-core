@@ -8,10 +8,10 @@ class ServerHelloMessage extends PiranhaMessage {
     this.version = 0
   }
 
-  encode () {
+  async encode () {
     this.writeInt(24)
     for (let i = 0; i < 24; i++)
-    { this.writeByte(1) }
+    { this.writeInt(1) }
   }
 }
 

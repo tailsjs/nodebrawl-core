@@ -1,6 +1,12 @@
 const ByteArray = require('./ByteArray')
 
 class ByteStream {
+  /**
+   * ByteStream
+   * For clear communication between client and server.
+   * 
+   * @param { Buffer } data Bytes
+   */
   constructor (data) {
     // eslint-disable-next-line new-cap
     this.buffer = data != null ? data : Buffer.alloc(0)
@@ -9,6 +15,10 @@ class ByteStream {
     this.bitOffset = 0
   }
 
+  /**
+   *  Reading Int from Bytes
+   * @returns { Number } Int
+   */
   readInt () {
     this.bitOffset = 0
     return (this.buffer[this.offset++] << 24 |
@@ -21,12 +31,20 @@ class ByteStream {
     this.bitOffset += len
   }
 
+  /**
+   *  Reading Short from Bytes (`commonly isn't used.`)
+   * @returns { Number } Short
+   */
   readShort () {
     this.bitOffset = 0
     return (this.buffer[this.offset++] << 8 |
             this.buffer[this.offset++])
   }
 
+  /**
+   * Writing value to Bytes as Short (c`ommonly isn't used`)
+   * @param {Number} value Your value to write.
+   */
   writeShort (value) {
     this.bitOffset = 0
     this.ensureCapacity(2)
@@ -34,6 +52,11 @@ class ByteStream {
     this.buffer[this.offset++] = (value)
   }
 
+
+  /**
+   * Writing value to Bytes as Int
+   * @param {Number} value Your value to write.
+   */
   writeInt (value) {
     this.bitOffset = 0
     this.ensureCapacity(4)
@@ -43,10 +66,18 @@ class ByteStream {
     this.buffer[this.offset++] = (value)
   }
 
+  /**
+   * Get Bytes in String
+   * @returns { String } Bytes in String form (`AA-BB-CC`)
+   */
   getHex () {
     return ByteArray.bytesToHex(this.buffer)
   }
 
+  /**
+   *  Reading String from Bytes
+   * @returns { String } String
+   */
   readString () {
     const length = this.readInt()
 
@@ -59,6 +90,10 @@ class ByteStream {
     return ''
   }
 
+  /**
+   * Reading VarInt from Bytes
+   * @returns { Number } VarInt
+   */
   readVInt () {
     let result = 0,
       shift = 0,
@@ -82,20 +117,35 @@ class ByteStream {
     return (result >> 1) ^ (-(result & 1))
   }
 
-  readDataReference () {
-    const x = this.readVInt();
-    return [ x, x === 0 ? 0 : this.readVInt() ] 
+  /**
+   * Reading 2 VarInts from Bytes
+   * @returns { Array<Number> } Commonly CSVID and ReferenceID
+   */
+  readDataReference(){
+    const a1 = this.readVInt()
+    return [ a1, a1 == 0 ? 0 : this.readVInt() ]
   }
 
-  writeDataReference (a1, a2) {
-    if(a1 == 0){
+  /**
+   * Writing values to Bytes as VarInts
+   * If value1 is 0, then 2nd value doesn't used
+   * 
+   * @param {Number} value1 Your value to write. Commonly it's a CSVID
+   * @param {Number} value2 Your value to write. Commonly it's a ReferenceID
+   */
+  writeDataReference (value1, value2) {
+    if(value1 < 1){
       this.writeVInt(0)
     }else{
-      this.writeVInt(a1)
-      this.writeVInt(a2)
+      this.writeVInt(value1)
+      this.writeVInt(value2)
     }
   }
 
+  /**
+   * Writing value to Bytes as VarInt
+   * @param {Number} value Your value to write.
+   */
   writeVInt (value) {
     this.bitOffset = 0
     let temp = (value >> 25) & 0x40
@@ -134,6 +184,10 @@ class ByteStream {
     }
   }
 
+  /**
+   * Writing value to Bytes as Boolean
+   * @param {Boolean} value Your value to write.
+   */
   writeBoolean (value) {
     if (this.bitOffset === 0) {
       this.ensureCapacity(1)
@@ -146,6 +200,18 @@ class ByteStream {
     this.bitOffset = (this.bitOffset + 1) & 7
   }
 
+  /**
+   * Reading Boolean from Bytes
+   * @returns { Boolean } Boolean (`true|false`)
+   */
+  readBoolean(){
+    return this.readVInt() >= 1
+  }
+
+  /**
+   * Writing value to Bytes as String
+   * @param {String} value Your value to write.
+   */
   writeString (value) {
     if (value == null || value.length > 90000) {
       this.writeInt(-1)
@@ -158,43 +224,79 @@ class ByteStream {
     this.offset += buf.length
   }
 
+  /**
+   * Writing value to Bytes as String (`You can just use writeString()`)
+   * @param {String} value Your value to write.
+   */
   writeStringReference = this.writeString
 
+  /**
+   * Writing value to Bytes as LongLong (`commonly isn't used`)
+   * @param {Number} value Your value to write.
+   */
   writeLongLong (value) {
     this.writeInt(value >> 32)
     this.writeInt(value)
   }
 
-  writeLogicLong (a1, a2) {
-    this.writeVInt(a1)
-    this.writeVInt(a2)
+  /**
+   * Writing values to Bytes as VarInts
+   * 
+   * @param {Number} value1 Your value to write.
+   * @param {Number} value2 Your value to write.
+   */
+  writeLogicLong (value1, value2) {
+    this.writeVInt(value1)
+    this.writeVInt(value2)
   }
 
+  /**
+   * Reading 2 VarInts from Bytes
+   * @returns { Array<Number> } LogicLong VarInts
+   */
   readLogicLong () {
-    return [ this.readVInt(), this.readVInt() ] 
+    return [ this.readVInt(), this.readVInt() ]
   }
 
-  writeLong (a1, a2) {
-    this.writeInt(a1)
-    this.writeInt(a2)
+  /**
+   * Writing values to Bytes as Ints
+   * 
+   * @param {Number} value1 Your value to write.
+   * @param {Number} value2 Your value to write.
+   */
+  writeLong (value1, value2) {
+    this.writeInt(value1)
+    this.writeInt(value2)
   }
 
+  /**
+   * Reading 2 Ints from Bytes
+   * @returns { Array<Number> } Long Ints
+   */
   readLong () {
     return [ this.readInt(), this.readInt() ]
   }
 
+  /**
+   * Writing value to Bytes as Byte
+   * @param {Number} value Your value to write.
+   */
   writeByte (value) {
     this.bitOffset = 0
     this.ensureCapacity(1)
     this.buffer[this.offset++] = value
   }
 
-  writeBytes (bytes) {
-    const length = bytes.length
+  /**
+   * Writing value to Bytes as ByteArray
+   * @param {Buffer} buffer Your buffer to write.
+   */
+  writeBytes (buffer) {
+    const length = buffer.length
 
-    if (bytes != null) {
+    if (buffer != null) {
       this.writeInt(length)
-      this.buffer = Buffer.concat([this.buffer, bytes])
+      this.buffer = Buffer.concat([this.buffer, buffer])
       this.offset += length
       return
     }
@@ -202,7 +304,10 @@ class ByteStream {
     this.writeInt(-1)
   }
 
-
+  /**
+   * Adding more space to Buffer
+   * @param {Number} capacity Amount of new space
+   */
   ensureCapacity (capacity) {
     const bufferLength = this.buffer.length
 
@@ -213,8 +318,14 @@ class ByteStream {
     }
   }
 
+  /**
+   * Send a packet to the server.
+   */
   send () {
+    if (this.id < 20000) return;
+
     this.encode()
+
     const header = Buffer.alloc(7)
     header.writeUInt16BE(this.id, 0)
     header.writeUIntBE(this.buffer.length, 2, 3)

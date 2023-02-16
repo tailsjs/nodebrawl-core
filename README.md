@@ -19,3 +19,6 @@ The world's first open source Brawl Stars private server core written on JavaScr
 Because it's core. You need implement all messages/packets and logic by yourself.
 
 ![screen](/Screens/console.png)
+
+## Forks:
+ * [nodebrawl-core-http](https://github.com/TailedTeam/nodebrawl-core-http)

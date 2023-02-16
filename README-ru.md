@@ -20,3 +20,6 @@
 Потому что это ядро. Вам нужно реализовать все пакеты и логику самостоятельно.
 
 ![screen](/Screens/console.png)
+
+## Форки:
+ * [nodebrawl-core-http](https://github.com/TailedTeam/nodebrawl-core-http)

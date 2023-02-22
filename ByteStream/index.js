@@ -1,12 +1,12 @@
 const ByteArray = require('./ByteArray')
 
+/**
+  * ByteStream
+  * 
+  * For clear communication between client and server.
+  * 
+  */
 class ByteStream {
-  /**
-   * ByteStream
-   * For clear communication between client and server.
-   * 
-   * @param { Buffer } data Bytes
-   */
   constructor (data) {
     // eslint-disable-next-line new-cap
     this.buffer = data != null ? data : Buffer.alloc(0)

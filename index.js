@@ -51,7 +51,7 @@ server.on('connection', async (client) => {
   })
 })
 
-server.once('listening', () => console.log(`Server started on ${PORT} port!`))
+server.once('listening', () => console.log(`[SERVER] >> Server started on ${PORT} port!`))
 server.listen(PORT)
 
 

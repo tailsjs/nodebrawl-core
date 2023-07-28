@@ -1,20 +1,21 @@
 const ByteStream = require('../ByteStream')
+const Messaging = require("../Networking/Messaging")
 
 /**
   * PiranhaMessage
   * 
   * A main handler of packets.
  */
-class PiranhaMessage extends ByteStream {
+class PiranhaMessage extends Messaging {
   /**
    * PiranhaMessage
    * 
    * A main handler of packets.
    * 
-   * @param { Buffer } bytes Bytes
+   * @param { Session } session User session (this.session)
    */
-  constructor (bytes) {
-    super(bytes)
+  constructor (session) {
+    super(session)
     /**
      * Packet ID.
      */
@@ -27,6 +28,10 @@ class PiranhaMessage extends ByteStream {
      * Packet version.
      */
     this.version = 0
+    /**
+     * ByteStream class.
+     */
+    this.stream = null
   }
 
   /**

@@ -1,6 +1,8 @@
-# nodebrawl-core
+# nodebrawl-core [NIGHTLY 3.0]
 The world's first open source Brawl Stars private server core written on JavaScript. <br>
 *[Now uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Classes</a> instead of <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">Functions!</a>]*
+
+* Not recommended for using. Сode can be unstable. All nightly changelogs [here](/NIGHTLY.md)
 
 * [Русский язык](/README-ru.md)
 

@@ -1,20 +1,22 @@
 const PiranhaMessage = require('../../PiranhaMessage')
+const ByteStream = require("../../../ByteStream")
 const ServerHelloMessage = require('../Server/ServerHelloMessage')
 
 class ClientHelloMessage extends PiranhaMessage {
-  constructor (bytes, client) {
-    super(bytes)
-    this.client = client
+  constructor (bytes, session) {
+    super(session)
+    this.session = session
     this.id = 10100
     this.version = 0
+    this.stream = new ByteStream(bytes)
   }
 
   async decode () {
-    // this.readInt()
+    this.stream.readInt()
   }
 
   async process () {
-    await new ServerHelloMessage(this.client).send()
+    await new ServerHelloMessage(this.session).send()
   }
 }
 

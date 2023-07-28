@@ -5,29 +5,29 @@ const Messages = new MessageFactory()
 
 const PORT = 9339
 
-server.on('connection', async (client) => {
-  client.setNoDelay(true)
-  client.log = function (text) {
+server.on('connection', async (session) => {
+  session.setNoDelay(true)
+  session.log = function (text) {
     return console.log(`[${this.remoteAddress.split(':').slice(-1)}] >> ${text}`)
   }
 
-  client.log('A wild connection appeard!')
+  session.log('A wild connection appeard!')
   
   const packets = Messages.getPackets();
 
-  client.on('data', async (packet) => {
+  session.on('data', async (packet) => {
     const message = {
       id: packet.readUInt16BE(0),
       len: packet.readUIntBE(2, 3),
       version: packet.readUInt16BE(5),
-      payload: packet.slice(7, this.len),
-      client,
+      payload: packet.slice(7, this.len)
     }
+    
     if (packets.indexOf(String(message.id)) !== -1) {
       try {
-        const packet = new (Messages.handle(message.id))(message.payload, client)
+        const packet = new (Messages.handle(message.id))(message.payload, session)
 
-        client.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
+        session.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
 
         await packet.decode()
         await packet.process()
@@ -35,19 +35,19 @@ server.on('connection', async (client) => {
         console.log(e)
       }
     } else {
-      client.log(`Gotcha undefined ${message.id} packet!`)
+      session.log(`Gotcha undefined ${message.id} packet!`)
     }
   })
 
-  client.on('end', async () => {
-    return client.log('Client disconnected.')
+  session.on('end', async () => {
+    return session.log('Client disconnected.')
   })
 
-  client.on('error', async error => {
+  session.on('error', async error => {
     try {
-      client.log('A wild error!')
+      session.log('A wild error!')
       console.log(error)
-      client.destroy()
+      session.destroy()
     } catch (e) { }
   })
 })

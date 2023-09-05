@@ -1,10 +1,11 @@
 const fs = require('fs')
+const path = require("node:path")
 
 class MessageFactory {
   constructor () {
     this.packets = {}
 
-    fs.readdir('./Protocol/Messages/Client', (err, files) => {
+    fs.readdir(path.join(__dirname, "Messages", "Client"), (err, files) => {
       if (err)console.log(err)
       files.forEach(e => {
         try{
@@ -13,19 +14,15 @@ class MessageFactory {
 
           this.packets[packetClass.id] = Packet
         }catch(err){
-          console.log(`[SERVER] >> A wild error while initializing "${e.replace(".js", "")}" packet!`)
+          Err(`A wild error while initializing "${e.replace(".js", "")}" packet!`)
           console.log(err)
         }
       })
     })
   }
 
-  handle (id) {
-    return this.packets[id]
-  };
-
-  getPackets () {
-    return Object.keys(this.packets)
+  getAllPackets () {
+    return this.packets
   }
 }
 

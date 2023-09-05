@@ -1,6 +1,6 @@
 {
   "name": "nodebrawl-core",
-  "version": "2.4.0-nightly",
+  "version": "3.0.0-nightly",
   "description": "The world's first open source Brawl Stars private server core written on JavaScript.",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "author": "tailsjs",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.4.0",
     "fs": "^0.0.1-security",
     "net": "^1.0.2"
   },

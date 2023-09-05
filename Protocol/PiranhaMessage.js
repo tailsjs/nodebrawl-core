@@ -1,4 +1,3 @@
-const ByteStream = require('../ByteStream')
 const Messaging = require("../Networking/Messaging")
 
 /**

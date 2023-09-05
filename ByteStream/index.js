@@ -1,5 +1,3 @@
-const ByteArray = require('./ByteArray')
-
 /**
   * ByteStream
   * 
@@ -71,7 +69,7 @@ class ByteStream {
    * @returns { String } Bytes in String form (`AA-BB-CC`)
    */
   getHex () {
-    return ByteArray.bytesToHex(this.buffer)
+    return this.buffer.toString("hex").toUpperCase().match(/.{0,2}/g).filter(e => e != "").join("-")
   }
 
   /**
@@ -302,6 +300,17 @@ class ByteStream {
     }
 
     this.writeInt(-1)
+  }
+
+  /**
+   * Writing HEX to Bytes
+   * @param {String} str HEX data.
+   */
+  writeHex(str){
+    let encoded = Buffer.from(str.replace(/-/g, '').match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+
+    this.buffer = Buffer.concat([this.buffer, encoded]);
+    this.offset += encoded.length
   }
 
   /**

@@ -1,6 +1,19 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.09.??
+* MessageFactory now uses `node:path`
+* MessageFactory got new function `getAllPackets`
+* MessageFactory got rid of functions `handle` and `getPackets`.
+* Now all logs are colored.
+* `ByteStream` class got new function `writeHex`
+```js
+this.stream.writeHex("00AA00")
+```
+* New `MessagesHandler` class, whichs handles packets.
+* Removed `ByteArray` class.
+* New function in `Messaging` class `generateHeader`, which generates header for packet.
+
 ### 2023.07.28
 * A new `Messaging` class has been created.
 * `PiranhaMessage` extends the `Messaging` class instead of the `ByteStream` class
@@ -27,35 +40,4 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Rewrite `MessageFactory` and write better `MessageHandler`
-```js
-// index.js
-const MessageFactory = require("./Protocol/MessageFactory")
-const MessageHandlerClass = require("./Networking/MessageHandler") // Maybe.
-
-const packets = MessageFactory.getPackets()
-
-const MessageHandler = new MessageHandlerClass(packets)
-
-await MessageHandler.handle(Packet.ID, params)
-
-// MessageHandler.js
-class MessageHandler {
-    constructor(packets){
-        this.packets = packets
-    }
-
-    async handle(id, params){
-        if(Object.keys(this.packets).includes(id)){
-            // I guess you got it.
-        }else{
-            // This too
-        }
-    }
-}
-```
-* Add `writeHex` into `ByteStream` class.
-```js
-this.stream.writeHex("00AA00")
-```
-* Colored logs.
+* Hm?

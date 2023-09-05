@@ -2,41 +2,36 @@ const net = require('net')
 const MessageFactory = require('./Protocol/MessageFactory')
 const server = new net.Server()
 const Messages = new MessageFactory()
+const MessagesHandler = require("./Networking/MessagesHandler")
+require("colors"), require("./Utils/Logger");
 
 const PORT = 9339
 
 server.on('connection', async (session) => {
   session.setNoDelay(true)
+
   session.log = function (text) {
-    return console.log(`[${this.remoteAddress.split(':').slice(-1)}] >> ${text}`)
+    return Client(this.remoteAddress.split(':').slice(-1), text)
+  }
+
+  session.errLog = function (text) {
+    return ClientError(this.remoteAddress.split(':').slice(-1), text)
   }
 
   session.log('A wild connection appeard!')
   
-  const packets = Messages.getPackets();
+  const packets = Messages.getAllPackets();
+  const MessageHandler = new MessagesHandler(session, packets)
 
   session.on('data', async (packet) => {
     const message = {
       id: packet.readUInt16BE(0),
       len: packet.readUIntBE(2, 3),
       version: packet.readUInt16BE(5),
-      payload: packet.slice(7, this.len)
+      bytes: packet.slice(7, this.len)
     }
-    
-    if (packets.indexOf(String(message.id)) !== -1) {
-      try {
-        const packet = new (Messages.handle(message.id))(message.payload, session)
 
-        session.log(`Gotcha ${message.id} (${packet.constructor.name}) packet! `)
-
-        await packet.decode()
-        await packet.process()
-      } catch (e) {
-        console.log(e)
-      }
-    } else {
-      session.log(`Gotcha undefined ${message.id} packet!`)
-    }
+    await MessageHandler.handle(message.id, message.bytes, [])
   })
 
   session.on('end', async () => {
@@ -45,17 +40,17 @@ server.on('connection', async (session) => {
 
   session.on('error', async error => {
     try {
-      session.log('A wild error!')
-      console.log(error)
+      session.errLog('A wild error!')
+      console.error(error)
       session.destroy()
     } catch (e) { }
   })
 })
 
-server.once('listening', () => console.log(`[SERVER] >> Server started on ${PORT} port!`))
+server.once('listening', () => Log(`Server started on ${PORT} port!`))
 server.listen(PORT)
 
 
-process.on("uncaughtException", e => console.log(e));
+process.on("uncaughtException", e => Warn(e));
 
-process.on("unhandledRejection", e => console.log(e));
+process.on("unhandledRejection", e => Warn(e));

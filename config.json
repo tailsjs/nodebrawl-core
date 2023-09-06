@@ -1,0 +1,11 @@
+{
+    "port": 9339,
+    "serverName": "Server",
+    "crypto": {
+        "activate": false,
+        "keys": {
+            "key": "fhsd6f86f67rt8fw78fw789we78r9789wer6re",
+            "nonce": "nonce"
+        }
+    }
+}

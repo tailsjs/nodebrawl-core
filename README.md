@@ -1,6 +1,6 @@
-# nodebrawl-core [NIGHTLY 3.0]
-The world's first open source Brawl Stars private server core written on JavaScript. <br>
-*[Now uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Classes</a> instead of <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">Functions!</a>]*
+# nodesc-core [NIGHTLY 3.0]
+
+The world's first open source Supercell private server core written on JavaScript. <br>
 
 * Not recommended for using. Сode can be unstable. All nightly changelogs [here](/NIGHTLY.md)
 
@@ -15,7 +15,7 @@ The world's first open source Brawl Stars private server core written on JavaScr
 2. Type in console `npm install`
 3. `node index`
 
-* Now you can connect to your server through any Brawl Stars client with Frida Injection.
+* Now you can connect to your server through any Supercell client with Frida Injection.
 
 ## Why game isn't loading?
 Because it's core. You need implement all messages/packets and logic by yourself.

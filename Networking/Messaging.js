@@ -1,3 +1,5 @@
+const config = require("../config.json")
+
 class Messaging {
     constructor(session){
         this.session = session;
@@ -7,6 +9,10 @@ class Messaging {
         if (this.id < 20000) return;
     
         this.encode()
+
+        if (config.crypto.activate) {
+            this.stream.buffer = this.session.crypto.encrypt(this.stream.buffer)
+        }
     
         const header = this.generateHeader(this.id, this.stream.buffer.length, this.version)
 

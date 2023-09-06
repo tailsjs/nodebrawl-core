@@ -1,6 +1,11 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.09.07
+* Added `config.json` file for setting some parameters.
+* New core name! `nodebrawl-core` -> `nodesc-core`. Repo name will be changed after 3.0 release.
+* Added RC4 crypto implementation. You can change keys in `config.json` file.
+
 ### 2023.09.06
 * MessageFactory now uses `node:path`
 * MessageFactory got new function `getAllPackets`

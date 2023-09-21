@@ -1,6 +1,6 @@
 {
   "name": "nodesc-core",
-  "version": "3.0.0-nightly2",
+  "version": "3.0.0-nightly3",
   "description": "The world's first open source Supercell private server core written on JavaScript.",
   "main": "index.js",
   "scripts": {

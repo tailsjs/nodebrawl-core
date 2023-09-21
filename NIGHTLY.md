@@ -1,6 +1,20 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.09.22
+* Added `sessions`.
+* `Messaging` class got new functions `sendToSession` and `sendToSessions`
+* * It means, you now can send packets from one session to another. (For example, `AllianceDataMessage`)
+* * Also it means, you can code to do send packets by lowID.
+```js
+const SESSION_ID = 1
+const SECOND_SESSION_ID = 5
+
+new ExampleMessage(this.session).sendToSession(SESSION_ID)
+new ExampleMessage(this.session).sendToSessions([ SESSION_ID, SECOND_SESSION_ID ])
+```
+* `Messaging`, `MessagesHandler` and `CryptoRC4` got `JSDocs`
+
 ### 2023.09.07
 * Added `config.json` file for setting some parameters.
 * New core name! `nodebrawl-core` -> `nodesc-core`. Repo name will be changed after 3.0 release.

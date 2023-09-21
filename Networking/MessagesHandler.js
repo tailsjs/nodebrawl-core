@@ -4,6 +4,12 @@ class MessagesHandler {
         this.packets = packets
     }
 
+    /**
+     * Handle packet
+     * @param { Number } id Packet ID
+     * @param { Buffer } bytes Packet bytes
+     * @param { Object } args Some other args, if you want.
+     */
     async handle(id, bytes, args){
         if(this.isPacketExists(id.toString())){
             try{
@@ -22,10 +28,20 @@ class MessagesHandler {
         }
     }
 
+    /**
+     * Check if packet exists
+     * @param { Number } id Packet ID
+     * @returns { boolean } Is packet exists?
+     */
     isPacketExists(id){
         return Object.keys(this.packets).includes(id)
     }
 
+    /**
+     * Get packet handler
+     * @param { Number } id Packet ID
+     * @returns { Class } Packet class 
+     */
     getPacketHandler(id){
         return this.packets[id]
     }

@@ -20,7 +20,10 @@ class MessageFactory {
       })
     })
   }
-
+  /**
+   * Get all packets
+   * @returns { Object } Packets object
+   */
   getAllPackets () {
     return this.packets
   }

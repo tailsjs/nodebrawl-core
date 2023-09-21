@@ -9,6 +9,8 @@ require("colors"), require("./Utils/Logger");
 
 const PORT = config.port
 
+global.sessions = []
+
 server.on('connection', async (session) => {
   session.setNoDelay(true)
 
@@ -24,7 +26,11 @@ server.on('connection', async (session) => {
 
   session.crypto = new Crypto(config.crypto.keys.key, config.crypto.keys.nonce)
 
-  session.log('A wild connection appeard!')
+  session.id = sessions.length == 0 ? 1 : sessions[session.length - 1].id + 1
+
+  global.sessions.push(session)
+
+  session.log(`A wild connection appeard! (SESSIONID: ${session.id})`)
   
   const packets = Messages.getAllPackets();
   const MessageHandler = new MessagesHandler(session, packets)
@@ -45,11 +51,13 @@ server.on('connection', async (session) => {
   })
 
   session.on('end', async () => {
+    sessions = sessions.filter(otherSession => otherSession.id != session.id)
     return session.log('Client disconnected.')
   })
 
   session.on('error', async error => {
     try {
+      sessions = sessions.filter(otherSession => otherSession.id != session.id)
       session.errLog('A wild error!')
       console.error(error)
       session.destroy()

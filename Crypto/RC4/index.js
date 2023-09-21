@@ -10,11 +10,21 @@ class CryptoRC4 {
       this.decryptStream.update(Buffer.concat([this.key, this.nonce]));
   }
 
+  /**
+   * Decrypting packet bytes
+   * @param { Buffer } data Encrypted packet bytes
+   * @returns { Buffer } Decrypted packet bytes
+   */
   decrypt(data) {
       const decryptedData = this.decryptStream.update(data);
       return decryptedData;
   }
 
+  /**
+   * Encrypting packet bytes
+   * @param { Buffer } data Decrypted packet bytes
+   * @returns { Buffer } Encrypted packet bytes
+   */
   encrypt(data) {
       const encryptedData = this.encryptStream.update(data);
       return encryptedData;

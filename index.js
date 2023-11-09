@@ -3,7 +3,7 @@ const config = require("./config.json")
 const Crypto = require("./Crypto/RC4")
 const MessageFactory = require('./Protocol/MessageFactory')
 const server = new net.Server()
-const Messages = new MessageFactory()
+const Messages = new MessageFactory(config.useLegacyPacketLoader)
 const MessagesHandler = require("./Networking/MessagesHandler")
 require("colors"), require("./Utils/Logger");
 
@@ -59,7 +59,7 @@ server.on('connection', async (session) => {
     try {
       sessions = sessions.filter(otherSession => otherSession.id != session.id)
       session.errLog('A wild error!')
-      console.error(error)
+      session.errLog(error)
       session.destroy()
     } catch (e) { }
   })

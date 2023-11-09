@@ -1,6 +1,20 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.11.10
+* Rewrited `MessageFactory` packet loader. Now it can use directories.
+* * Now you need to change imports if you put packet in subdirectory.
+```js
+// In /Protocol/Messages/Client
+const PiranhaMessage = require("../../PiranhaMessage") 
+const ByteStream = require("../../../ByteStream")
+// In /Protocol/Messages/Client/Subdirectory
+const PiranhaMessage = require("../../../PiranhaMessage") 
+const ByteStream = require("../../../../ByteStream")
+```
+* * You can back to legacy loader, if you have some troubles with new one.
+* * Legacy Loader will be removed after 3.1 release.
+
 ### 2023.09.22
 * Added `sessions`.
 * `Messaging` class got new functions `sendToSession` and `sendToSessions`
@@ -59,4 +73,21 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Hm?
+* Stable packet decoding
+```js
+const Queue = require("./Networking/Queue")
+
+session.queue = new Queue()
+
+// When got something
+
+if (session.queue.isBusy()) {
+    session.queue.push(bytes)
+
+    if (session.queue.isBusy()){
+        bytes = session.queue.release()
+    } else {
+        return;
+    }
+} 
+```

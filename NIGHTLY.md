@@ -1,6 +1,55 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.11.11
+* New `Queue` class, which handles big packets.
+* * Before:
+```js
+// It will split packet, if packet bytes length is more than 65,535
+session.on('data', async (packet) => {
+    const messageHeader = {
+      id: packet.readUInt16BE(0),
+      len: packet.readUIntBE(2, 3),
+      version: packet.readUInt16BE(5),
+      bytes: packet.slice(7, this.len)
+    }
+
+    await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {}) // For example, it will try to handle packets 10100, 94316, 883134
+})
+``` 
+* * After:
+```js
+// If it catches splitted packet, it will put in Queue. When packet length will be equal with packet bytes length (header excludes), it will release bytes to MessageHandler.
+session.on('data', async (bytes) => {
+    let messageHeader = {}
+
+    session.queue.push(bytes)
+
+    if (!session.queue.isBusy()) {
+      const queueBytes = session.queue.release()
+      messageHeader = {
+        id: queueBytes.readUInt16BE(0),
+        len: queueBytes.readUIntBE(2, 3),
+        version: queueBytes.readUInt16BE(5),
+        bytes: queueBytes.slice(7, this.len)
+      }
+    } else {
+      return;
+    }
+
+    await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {}) // Now it will handle only 10100 in that case.
+})
+```
+* Also for `Query` some configs in `config.json` was added.
+* * `maxQueueSize` - Max queue bytes size. If queue overfills, it will warn you, if you enabled `enableQueueOverfillingWarning`. You can set number to `0`, if you want to disable this. Default: `1024`
+* * `disconnectSessionOnQueueOverfilling` - Disconnect session if queue overfills? Default: `true`
+* * `enableQueueOverfillingWarning` - Warn you if session queue is overfilled? Default: `true`
+* `Queue` have states.
+* * `0` - `QUEUE_FREE` - Queue is free.
+* * `1` - `QUEUE_BUSY` - Queue is busy.
+* * `2` - `QUEUE_OVERFILLED` - Queue is overfilled.
+* * `3` - `QUEUE_PUSHED_MORE_THAN_EXPECTED` - Queue size is more than expected.
+
 ### 2023.11.10
 * Rewrited `MessageFactory` packet loader. Now it can use directories.
 * * Now you need to change imports if you put packet in subdirectory.
@@ -73,21 +122,4 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Stable packet decoding
-```js
-const Queue = require("./Networking/Queue")
-
-session.queue = new Queue()
-
-// When got something
-
-if (session.queue.isBusy()) {
-    session.queue.push(bytes)
-
-    if (session.queue.isBusy()){
-        bytes = session.queue.release()
-    } else {
-        return;
-    }
-} 
-```
+* Huh?

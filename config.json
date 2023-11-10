@@ -8,5 +8,8 @@
             "nonce": "nonce"
         }
     },
-    "useLegacyPacketLoader": false
+    "useLegacyPacketLoader": false,
+    "maxQueueSize": 1024,
+    "disconnectSessionOnQueueOverfilling": true,
+    "enableQueueOverfillingWarning": true
 }

@@ -14,6 +14,7 @@ global.sessions = []
 
 server.on('connection', async (session) => {
   session.setNoDelay(true)
+  session.setTimeout(config.sessionTimeoutSeconds * 1000)
 
   session.ip = session.remoteAddress.split(':').slice(-1);
 
@@ -83,7 +84,8 @@ server.on('connection', async (session) => {
 
   session.on('end', async () => {
     clearSession(session)
-    return session.log('Client disconnected.')
+    session.log('Client disconnected.')
+    return session.destroy() 
   })
 
   session.on('error', async error => {
@@ -91,8 +93,14 @@ server.on('connection', async (session) => {
       clearSession(session)
       session.errLog('A wild error!')
       console.error(error)
-      session.destroy()
+      return session.destroy()
     } catch (e) { }
+  })
+
+  session.on('timeout', async () => {
+    clearSession(session)
+    session.warn('Session timeout was reached.')
+    return session.destroy()
   })
 })
 

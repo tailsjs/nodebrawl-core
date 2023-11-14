@@ -1,6 +1,11 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2023.11.15
+* You can now configure the maximum inactivity time of the session.
+* New config in `config.json`
+* * `sessionTimeoutSeconds` - Maximum number of seconds of session inactivity. Default: `15`
+
 ### 2023.11.11
 * New `Queue` class, which handles big packets.
 * * Before:
@@ -122,4 +127,29 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Huh?
+* Fix TCP issue with packet merging.<br>
+`TCP is a stream-oriented protocol, meaning it doesn't have a concept of packets like UDP does. Instead, it provides a continuous stream of data. It's up to the application layer to define message boundaries.`
+##### Example:
+* What client sends:
+1. `27e400001200000000000d48656c6c6f2c20776f726c642100` - 10212, `SetNameMessage`
+2. `371600000e000000000001b907000000009a0a9a0a` - 14102, `EndClientTurnMessage`
+* What server receives:
+1. `27e400001200000000000d48656c6c6f2c20776f726c642100371600000e000000000001b907000000009a0a9a0a` - Two packets at once.
+##### My perfectly stupid idea:
+```js
+// Parse packets from these bytes.
+
+// Queue.js
+    constructor (...) {
+        ...
+        this.mergedPackets = [] // example: { id: 10100, len: 28, version: 0, bytes: Buffer }
+    }
+
+push (bytes) {
+  if (this.size() - 7 > this.getQueueExpectedSize()) {
+    // idk maybe later
+  }
+}
+```
+I guess i need to rewrite `Query`, huh?<br>
+I catched it accidentaly, when tested core on client emulator.

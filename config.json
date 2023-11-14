@@ -11,5 +11,6 @@
     "useLegacyPacketLoader": false,
     "maxQueueSize": 1024,
     "disconnectSessionOnQueueOverfilling": true,
-    "enableQueueOverfillingWarning": true
+    "enableQueueOverfillingWarning": true,
+    "sessionTimeoutSeconds": 15
 }

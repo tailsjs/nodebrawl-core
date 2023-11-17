@@ -34,7 +34,7 @@ server.on('connection', async (session) => {
 
   session.id = sessions.length == 0 ? 1 : sessions[session.length - 1].id + 1
 
-  session.queue = new Queue(config.maxQueueSize)
+  session.queue = new Queue(config.maxQueueSize, config.disableQueuebugtxtFile)
 
   global.sessions.push(session)
 
@@ -61,10 +61,27 @@ server.on('connection', async (session) => {
       case session.queue.QUEUE_PUSHED_MORE_THAN_EXPECTED:
         session.warn(`Queue got more bytes than expected! Expected: ${session.queue.getQueueExpectedSize()} size. Got: ${session.queue.size()} size.`)
       break;
+      case session.queue.QUEUE_DETECTED_MERGED_PACKETS:
+        session.warn(`Queue detected merged packets!`)
+      break;
     }
 
     if (!session.queue.isBusy()) {
       const queueBytes = session.queue.release()
+
+      if (Array.isArray(queueBytes)) {
+        session.log("Handling merged packets...")
+        for(let packet of queueBytes) {
+          if (config.crypto.activate) {
+            packet.bytes = await session.crypto.decrypt(packet.bytes)
+          }
+          
+          await MessageHandler.handle(packet.id, packet.bytes, { })
+        }
+
+        return session.log("Merged packets was handled.")
+      }
+      
       messageHeader = {
         id: queueBytes.readUInt16BE(0),
         len: queueBytes.readUIntBE(2, 3),

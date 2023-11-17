@@ -12,5 +12,6 @@
     "maxQueueSize": 1024,
     "disconnectSessionOnQueueOverfilling": true,
     "enableQueueOverfillingWarning": true,
-    "sessionTimeoutSeconds": 15
+    "sessionTimeoutSeconds": 15,
+    "disableQueuebugtxtFile": true
 }

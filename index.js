@@ -32,7 +32,7 @@ server.on('connection', async (session) => {
 
   session.crypto = new Crypto(config.crypto.keys.key, config.crypto.keys.nonce)
 
-  session.id = sessions.length == 0 ? 1 : sessions[session.length - 1].id + 1
+  session.id = sessions.length == 0 ? 1 : sessions[sessions.length - 1].id + 1
 
   session.queue = new Queue(config.maxQueueSize, config.disableQueuebugtxtFile)
 

@@ -1,6 +1,13 @@
 const config = require("../config.json")
 
 class Messaging {
+    /**
+     * Messaging
+     * 
+     * Class for server responses.
+     * 
+     * @param { Session } session User session (`this.session`)
+     */
     constructor(session){
         this.session = session;
     }

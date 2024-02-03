@@ -1,6 +1,7 @@
 {
     "port": 9339,
     "serverName": "Server",
+    "enableLogs": true,
     "crypto": {
         "activate": false,
         "keys": {

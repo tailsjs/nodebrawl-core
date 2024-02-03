@@ -1,4 +1,12 @@
 class MessagesHandler {
+    /**
+     * MessagesHandler
+     * 
+     * Class for handling server packets
+     * 
+     * @param { Session } session User session (`this.session`)
+     * @param { Array } packets Server packets, that you got through `MessageFactory`
+     */
     constructor(session, packets){
         this.session = session
         this.packets = packets

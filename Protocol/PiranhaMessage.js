@@ -3,15 +3,15 @@ const Messaging = require("../Networking/Messaging")
 /**
   * PiranhaMessage
   * 
-  * A main handler of packets.
+  * A main class for packets.
  */
 class PiranhaMessage extends Messaging {
   /**
    * PiranhaMessage
    * 
-   * A main handler of packets.
+   * A main class for packets.
    * 
-   * @param { Session } session User session (this.session)
+   * @param { Session } session User session (`this.session`)
    */
   constructor (session) {
     super(session)
@@ -20,9 +20,9 @@ class PiranhaMessage extends Messaging {
      */
     this.id = 0
     /**
-     * Client variable.
+     * Session variable.
      */
-    this.client = null
+    this.session = null
     /**
      * Packet version.
      */

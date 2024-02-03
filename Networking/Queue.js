@@ -7,6 +7,14 @@ class Queue {
     
     originalMerged = ""
 
+    /**
+     * Queue.
+     * 
+     * For handling big packets from client.
+     * 
+     * @param { Number } maxQueueSize Maximum amount of Queue size in bytes.
+     * @param { Boolean } disableQueuebugtxtFile Disable queuebug.txt? Will be removed in the future.
+     */
     constructor (maxQueueSize, disableQueuebugtxtFile) {
         this.data = Buffer.alloc(0)
         this.maxQueueSize = maxQueueSize
@@ -15,6 +23,10 @@ class Queue {
         this.disableQueuebugtxtFile = disableQueuebugtxtFile
     }
 
+    /**
+     * Push bytes to Queue.
+     * @param { Buffer } bytes Bytes from client.
+     */
     push (bytes) {
         this.data = Buffer.concat([this.data, bytes])
 
@@ -32,6 +44,10 @@ class Queue {
         }
     }
 
+    /**
+     * Release bytes from Queue.
+     * @returns { Buffer }
+     */
     release () {
         const returnableData = this.unmergedPackets.length != 0 ? this.unmergedPackets : this.data 
 
@@ -43,22 +59,40 @@ class Queue {
         return returnableData
     }
 
+    /**
+     * Check if Queue is busy.
+     * @returns { Boolean }
+     */
     isBusy () {
         if (this.size() === 0) return false;
         return this.getQueueExpectedSize() > this.size() - 7
     }
 
+    /**
+     * Get Queue expected size.
+     * @returns { Number }
+     */
     getQueueExpectedSize () {
         return this.data.readUIntBE(2, 3)
     }
 
+    /**
+     * Get Queue current size.
+     * @returns { Number }
+     */
     size () {
         return this.data.length
     }
 
-    unmerge (bytes, leng) {
+    /**
+     * Unmerging merged packets.
+     * @param { Buffer } bytes Merged packet bytes
+     * @param { Number } len Merged packet length
+     * @returns { Boolean }
+     */
+    unmerge (bytes, len) {
         if (bytes.length < 7) return false;
-        const packetBytes = bytes.slice(leng)
+        const packetBytes = bytes.slice(len)
         const packetId = packetBytes.readUInt16BE(0)
         const newLength = packetBytes.readUIntBE(2, 3)
 

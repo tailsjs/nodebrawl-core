@@ -1,6 +1,18 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.02.03
+* Rewrited `Logger`.
+* * Added new `Debug` and `ServerLog` functions.
+```js
+ServerLog("Hello, world!") // [SERVER] >> Hello, world!
+Debug("Hey, this is debug!") // [index.js:2:7] >> Hey, this is debug!
+Debug("Now it shows time!", true) // [index.js:3:7] (Sat, 03 Feb 2024 00:00:00 GMT) >> Now it shows time!
+```
+* New config in `config.json`
+* * `enableLogs` - Enable logs? (Socket connecting, etc.) (Doesn't affect on server logs). Default: `true`
+* More jsdocs.
+
 ### 2023.11.17
 * At most fixed TCP issue with packet merging.
 * If queue will detect incorrect packet, it will report needfull information into `queuebug.txt` file and will turn off server.

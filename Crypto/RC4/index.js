@@ -1,6 +1,14 @@
 const RC4 = require('simple-rc4');
 
 class CryptoRC4 {
+    /**
+     * CryptoRC4.
+     * 
+     * Decoding and encoding packets.
+     * 
+     * @param { String } key RC4 Key
+     * @param { String } nonce RC4 Nonce
+     */
   constructor(key, nonce) {
       this.key = Buffer.from(key);
       this.nonce = Buffer.from(nonce);

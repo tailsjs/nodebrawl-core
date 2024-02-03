@@ -12,23 +12,19 @@ const PORT = config.port
 
 global.sessions = []
 
+const clearSession = (session) => sessions = sessions.filter(otherSession => otherSession.id != session.id)
+
+
+
 server.on('connection', async (session) => {
   session.setNoDelay(true)
   session.setTimeout(config.sessionTimeoutSeconds * 1000)
 
   session.ip = session.remoteAddress.split(':').slice(-1);
 
-  session.log = function (text) {
-    return Client(session.ip, text)
-  }
-
-  session.warn = function (text) {
-    return ClientWarn(session.ip, text)
-  }
-
-  session.errLog = function (text) {
-    return ClientError(session.ip, text)
-  }
+  session.log = (text) => Client(session.ip, text)
+  session.warn = (text) => ClientWarn(session.ip, text)
+  session.errLog = (text) => ClientError(session.ip, text)
 
   session.crypto = new Crypto(config.crypto.keys.key, config.crypto.keys.nonce)
 
@@ -88,15 +84,13 @@ server.on('connection', async (session) => {
         version: queueBytes.readUInt16BE(5),
         bytes: queueBytes.slice(7, this.len)
       }
-    } else {
-      return;
-    }
+      if (config.crypto.activate) {
+        messageHeader.bytes = await session.crypto.decrypt(messageHeader.bytes)
+      }
+  
+      await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {})
 
-    if (config.crypto.activate) {
-      messageHeader.bytes = await session.crypto.decrypt(messageHeader.bytes)
     }
-
-    await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {})
   })
 
   session.on('end', async () => {
@@ -121,13 +115,8 @@ server.on('connection', async (session) => {
   })
 })
 
-function clearSession (session) {
-  sessions = sessions.filter(otherSession => otherSession.id != session.id)
-}
-
-server.once('listening', () => Log(`${config.serverName} started on ${PORT} port!`))
+server.once('listening', () => ServerLog(`${config.serverName} started on ${PORT} port!`))
 server.listen(PORT)
-
 
 process.on("uncaughtException", e => Warn(e.stack));
 

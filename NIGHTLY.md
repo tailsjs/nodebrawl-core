@@ -146,4 +146,4 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Huh?
+* Logging level

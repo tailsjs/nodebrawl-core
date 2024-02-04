@@ -1,6 +1,8 @@
 require("colors");
 const { enableLogs } = require("../config.json");
 
+const buildPrefix = (mainPrefix) => mainPrefix + " >> ".gray
+
 const PREFIXES = {
     SERVER: buildPrefix("[SERVER]".blue.bold),
     WARN: buildPrefix("[WARNING]".yellow.bold),
@@ -8,8 +10,6 @@ const PREFIXES = {
     FATAL: buildPrefix("[FATAL]".red.bold),
     LOG: buildPrefix("[LOG]".green.bold),
 }
-
-const buildPrefix = (mainPrefix) => mainPrefix + " >> ".gray
 
 const log = (text) => {
     if (!enableLogs) return;

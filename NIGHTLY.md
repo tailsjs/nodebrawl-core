@@ -1,6 +1,16 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.02.05
+* Rewrited `sessions` system.
+* * Now it's using [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+* * All destroy session logic now in `destroySession` function.
+```js
+destroySession(session, "log", "Hey! I'm a session!")
+destroySession(session, "warn", "Eeh?")
+destroySession(session, "err", "Oh no! 9+10 is NOT 21! :(")
+```
+
 ### 2024.02.03
 * Rewrited `Logger`.
 * * Added new `Debug` and `ServerLog` functions.
@@ -146,4 +156,4 @@ constructor(bytes, session){
 }
 ```
 #### Ideas bag:
-* Logging level
+* Huh?

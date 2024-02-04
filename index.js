@@ -1,26 +1,53 @@
-const net = require('net')
+const net = require('net') // Modules
 const config = require("./config.json")
 const Crypto = require("./Crypto/RC4")
 const MessageFactory = require('./Protocol/MessageFactory')
-const server = new net.Server()
-const Messages = new MessageFactory(config.useLegacyPacketLoader)
 const MessagesHandler = require("./Networking/MessagesHandler")
 const Queue = require("./Networking/Queue")
-require("colors"), require("./Utils/Logger");
+require("./Utils/Logger");
 
+const server = new net.Server() // Class inits
+const Messages = new MessageFactory(config.useLegacyPacketLoader)
+
+const packets = Messages.getAllPackets(); // Useful data for server
 const PORT = config.port
 
-global.sessions = []
+global.sessions = new Map(); // Sessions
 
-const clearSession = (session) => sessions = sessions.filter(otherSession => otherSession.id != session.id)
+const clearSession = (sessionId) => global.sessions.delete(sessionId) // Clear session
 
+const getLastSessionId = () => { // Get last session ID
+  const sessionsIds = Array.from(global.sessions.keys())
 
+  return sessionsIds.length == 0 ? 0 : sessionsIds[sessionsIds.length - 1]
+}
+
+const destroySession = (session, logType = "log", reason = "Client disconnected.") => {
+  if (!session) return;
+
+  switch (logType) {
+    case "log":
+      session.log(reason)
+      break
+    case "warn":
+      session.warn(reason)
+      break
+    case "err":
+      session.errLog(reason)
+      break
+    default:
+      session.log(reason)
+  }
+
+  session.destroy()
+  clearSession(session.id)
+}
 
 server.on('connection', async (session) => {
   session.setNoDelay(true)
   session.setTimeout(config.sessionTimeoutSeconds * 1000)
 
-  session.ip = session.remoteAddress.split(':').slice(-1);
+  session.ip = session.remoteAddress.split(':').slice(-1) + `:${session.remotePort}`;
 
   session.log = (text) => Client(session.ip, text)
   session.warn = (text) => ClientWarn(session.ip, text)
@@ -28,15 +55,14 @@ server.on('connection', async (session) => {
 
   session.crypto = new Crypto(config.crypto.keys.key, config.crypto.keys.nonce)
 
-  session.id = sessions.length == 0 ? 1 : sessions[sessions.length - 1].id + 1
+  session.id = getLastSessionId() + 1
 
   session.queue = new Queue(config.maxQueueSize, config.disableQueuebugtxtFile)
 
-  global.sessions.push(session)
+  global.sessions.set(session.id, session)
 
   session.log(`A wild connection appeard! (SESSIONID: ${session.id})`)
   
-  const packets = Messages.getAllPackets();
   const MessageHandler = new MessagesHandler(session, packets)
 
   session.on('data', async (bytes) => {
@@ -49,9 +75,7 @@ server.on('connection', async (session) => {
         if (config.enableQueueOverfillingWarning) session.warn(`Queue is overfilled! Queue size: ${session.queue.size()}`)
 
         if (config.disconnectSessionOnQueueOverfilling) {
-          session.warn(`Client disconnected.`)
-          clearSession(session)
-          session.destroy()
+          return destroySession(session, "warn", "Client disconnected.")
         }
       break;
       case session.queue.QUEUE_PUSHED_MORE_THAN_EXPECTED:
@@ -69,7 +93,7 @@ server.on('connection', async (session) => {
         session.log("Handling merged packets...")
         for(let packet of queueBytes) {
           if (config.crypto.activate) {
-            packet.bytes = await session.crypto.decrypt(packet.bytes)
+            packet.bytes = session.crypto.decrypt(packet.bytes)
           }
           
           await MessageHandler.handle(packet.id, packet.bytes, { })
@@ -82,10 +106,11 @@ server.on('connection', async (session) => {
         id: queueBytes.readUInt16BE(0),
         len: queueBytes.readUIntBE(2, 3),
         version: queueBytes.readUInt16BE(5),
-        bytes: queueBytes.slice(7, this.len)
+        bytes: queueBytes.slice(7, messageHeader.len)
       }
+
       if (config.crypto.activate) {
-        messageHeader.bytes = await session.crypto.decrypt(messageHeader.bytes)
+        messageHeader.bytes = session.crypto.decrypt(messageHeader.bytes)
       }
   
       await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {})
@@ -94,24 +119,23 @@ server.on('connection', async (session) => {
   })
 
   session.on('end', async () => {
-    clearSession(session)
-    session.log('Client disconnected.')
-    return session.destroy() 
+    return destroySession(session, "log", "Client disconnected.")
   })
 
   session.on('error', async error => {
+    if (error.message.includes("ECONNRESET")) {
+      return destroySession(session, "log", "Client disconnected.")
+    }
+
     try {
-      clearSession(session)
-      session.errLog('A wild error!')
-      console.error(error)
-      return session.destroy()
+      destroySession(session, "err", "A wild error!")
+      
+      return console.error(error)
     } catch (e) { }
   })
 
   session.on('timeout', async () => {
-    clearSession(session)
-    session.warn('Session timeout was reached.')
-    return session.destroy()
+    return destroySession(session, "warn", "Session timeout was reached.")
   })
 })
 

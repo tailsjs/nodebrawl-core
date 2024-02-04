@@ -14,7 +14,7 @@ class MessageFactory {
 
         for (const file of files) {
           try{
-            const Packet = require("./" + path.relative(__dirname, file).replace("\\", "/"))
+            const Packet = require("./" + path.relative(__dirname, file).replaceAll("\\", "/"))
             const packetClass = new Packet()
 
             this.packets[packetClass.id] = Packet

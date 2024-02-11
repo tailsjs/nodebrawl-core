@@ -1,6 +1,35 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.02.10
+* Update with QoL features. Maybe next is release.
+* Added `Time` functions for easier work with time functions (Like shop, etc.)
+* * You can change `unit` argument in `hasBeenPassed`, `addToTime`, `addToNowTime` from string to number, if you feel it so.
+* * JSDocs also included!
+```js
+const Time = require("./Utils/Time")
+
+parseTime("1 week, 2d, 3hours, 4 minutes, 5sec") // 788645000
+hasBeenPassed(Date.now() - 6000, "5s") // true
+hasBeenPassed(Date.now() + 10000, 15000) // false
+addToTime(1000, "5m") // 301000
+addToNowTime("5m") // Date.now() + 300000
+```
+* Added `CSVParser`.
+* * It's easy-to-use. If you rewriting your poor server from `ClassicBrawl`, it's very easy to understand.
+* * Here is example of parsing `characters.csv`
+```js
+const parse = require("./CSVParser")
+const data = parse("../../GameAssets/csv_logic/characters.csv")
+
+function getDefSkinById(id){
+    return data[id].DefaultSkin
+}
+
+getDefSkinById(0) // BanditGirlDefault
+getDefSkinById(1) // GunSlingerDefault
+```
+
 ### 2024.02.05
 * Rewrited `sessions` system.
 * * Now it's using [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)

@@ -13,7 +13,8 @@ The world's first open source Supercell private server core written on JavaScrip
 ## Setting up
 1. Download/clone a repository
 2. Type in console `npm install`
-3. `node index`
+3. Push your CSV files to `/GameAssets` directory.
+4. `node index`
 
 * Now you can connect to your server through any Supercell client with Frida Injection.
 

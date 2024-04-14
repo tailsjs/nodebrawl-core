@@ -1,6 +1,124 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.04.14
+* Biggest update ever.
+* Rewrited most of the core.
+* Added some related to Brawl Stars classes (they're in `/Logic` directory)
+* * Technical (`LogicVersion`) {maybe part of titan idk lmao}
+* * Related to ByteStream (`ChronosTextEntry`, `ChronosFileEntry`)
+* * Related to some messages (`Home/LogicGemOffer`, `PlayerDisplayData`, `ProLeagueSeasonData`, `LogicBattlePlayerMap`)
+* * You can use them like:
+```js
+const PlayerDisplayData = require("../../../../Logic/PlayerDisplayData")
+class SomeClientMessage extends PiranhaMessage {
+  constructor (bytes, session) {
+    ...
+    this.stream = this.DataStream.getByteStream(bytes);
+  }
+
+  decode () {
+    this.playerDisplayData = new PlayerDisplayData(this.stream)
+  }
+
+  process () {
+    console.log(this.playerDisplayData.name) // tailsjs
+  }
+}
+```
+* * or if static...
+```js
+const LogicVersion = require("../../../../Logic/LogicVersion")
+
+class SomeServerMessage extends PiranhaMessage {
+  constructor (bytes, session) {
+    ...
+    this.stream = this.DataStream.getByteStream();
+  }
+
+  async encode () {
+    this.stream.writeString("Server version is: " + LogicVersion.getVersionString())
+  }
+}
+```
+* Added `Patcher`
+* * Your best friend if you don't want to update apk so often.
+* * You need to enable it in `config.json` and push your csv files into `GameAssets` directory
+* * Also you need to write logic to make patcher fully work.
+* Rewrited `MessageFactory`
+* * It means, legacy loader was removed.
+* * Now you can get messages like
+```js
+const MessageFactory = require('./Protocol/MessageFactory')
+const Messages = new MessageFactory()
+
+const ClientHelloMessage = Messages.getMessage(10100)
+// you got this
+```
+* Rewrited `Crypto`
+* * Now it's named `StreamEncrypter` and it's very simple to use.
+* * Also added `Pepper` encryption.
+```js
+const Encrypter = new StreamEncrypter(CRYPTO_TYPE) // 0 - RC4, 1 - Pepper
+
+Encrypter.encrypt(20100, serverPacketData)
+Encrypter.decrypt(10100, clientPacketData)
+```
+* ByteStream now moved into `Titan/DataStream` directory
+* * Also added `ByteStreamHelper` class
+* Added some related to Titan classes (they're in `/Titan` directory)
+* * Crypto-related classes in `Titan/Crypto` directory
+* * Byte-working classes in `Titan/DataStream` directory
+* * Yes, i added `BitStream` also.
+```js
+const DataStream = require("./Titan/DataStream/")
+
+DataStream.getByteStream(bytes)
+DataStream.getByteStreamHelper(ByteStream)
+DataStream.getBitStream(bytes)
+```
+* * Also some helpful enums in `Titan/Enums` directory
+* * Related to some messages (`GlobalID`, `LogicCompressedString`, `LogicLong`) <!-- Fuck LogicLong -->
+* * Technical (`LogicMath`, `LogicHashTag`)
+* Updated `Logger`
+* * Now you can use it like `console.log()`
+```js
+require("./Utils/Logger")
+Log("I hate", 42, "bananas") // i hate 42 bananas
+```
+* Added `AdminConsole`
+* * I wrote some commands so you get the point
+```console
+> sessions
+[LOG] >> Sessions amount: 1
+> sessiondata 1
+[LOG] >> Session IP: 127.0.0.1:67881
+Queue state: 0
+> disconnect 1
+[127.0.0.1:50267] >> Client manually was disconnected!
+[LOG] >> Session with ID 1 was disconnected!
+> someunused
+Command "someunused" is not defined!
+> exit
+[WARNING] >> Server is off...
+```
+* * You can disable it in `config.json`
+* Some changes in `config.json`
+* * `enableAdminConsole` - Enable admin console? Default: `true`
+* * `crypto.type` - Encryption type. Default: `0`
+* * `crypto.pepper` - Pepper settings
+* * `crypto.pepper.client_secret_key` - Client secret key
+* * `crypto.pepper.server_public_key` - Server public key
+* * `patcher` - Patcher settings
+* * `patcher.enabled` - Enable patcher? Default: `true`
+* * `patcher.port` - Patcher port. Default: `80`
+* * Queue settings now in one object
+* * `queue` - Queue settings
+* * `queue.maxSize` - Max queue bytes size. If queue overfills, it will warn you, if you enabled `queue.enableOverfillingWarning`. You can set number to `0`, if you want to disable this. Default: `1024`
+* * `queue.disconnectSessionOnOverfilling` - Disconnect session if queue overfills? Default: `true`
+* * `queue.enableOverfillingWarning` - Warn you if session queue is overfilled? Default: `true`
+* * Removed `useLegacyPacketLoader` setting.
+
 ### 2024.02.10
 * Update with QoL features. Maybe next is release.
 * Added `Time` functions for easier work with time functions (Like shop, etc.)
@@ -103,7 +221,7 @@ session.on('data', async (bytes) => {
     await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {}) // Now it will handle only 10100 in that case.
 })
 ```
-* Also for `Query` some configs in `config.json` was added.
+* Also for `Queue` some configs in `config.json` was added.
 * * `maxQueueSize` - Max queue bytes size. If queue overfills, it will warn you, if you enabled `enableQueueOverfillingWarning`. You can set number to `0`, if you want to disable this. Default: `1024`
 * * `disconnectSessionOnQueueOverfilling` - Disconnect session if queue overfills? Default: `true`
 * * `enableQueueOverfillingWarning` - Warn you if session queue is overfilled? Default: `true`

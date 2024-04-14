@@ -4,7 +4,7 @@
     "enableLogs": true,
     "enableAdminConsole": true,
     "crypto": {
-        "activate": true,
+        "activate": false,
         "type": 0,
         "rc4": {
             "key": "fhsd6f86f67rt8fw78fw789we78r9789wer6re",

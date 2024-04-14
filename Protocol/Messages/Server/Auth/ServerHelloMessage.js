@@ -1,13 +1,11 @@
 const PiranhaMessage = require('../../../PiranhaMessage')
-const ByteStream = require("../../../../ByteStream")
 
 class ServerHelloMessage extends PiranhaMessage {
   constructor (session) {
     super(session)
     this.id = 20100
-    this.session = session
     this.version = 0
-    this.stream = new ByteStream()
+    this.stream = this.DataStream.getByteStream();
   }
 
   async encode () {

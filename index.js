@@ -1,15 +1,16 @@
 const net = require('net') // Modules
 const config = require("./config.json")
-const Crypto = require("./Crypto/RC4")
+const StreamEncrypter = require("./Titan/Crypto")
 const MessageFactory = require('./Protocol/MessageFactory')
 const MessagesHandler = require("./Networking/MessagesHandler")
 const Queue = require("./Networking/Queue")
+const PatcherServer = require("./Patcher/Server")
 require("./Utils/Logger");
 
 const server = new net.Server() // Class inits
-const Messages = new MessageFactory(config.useLegacyPacketLoader)
+const Messages = new MessageFactory()
+const Patcher = new PatcherServer()
 
-const packets = Messages.getAllPackets(); // Useful data for server
 const PORT = config.port
 
 global.sessions = new Map(); // Sessions
@@ -43,6 +44,8 @@ const destroySession = (session, logType = "log", reason = "Client disconnected.
   clearSession(session.id)
 }
 
+global.destroySession = destroySession
+
 server.on('connection', async (session) => {
   session.setNoDelay(true)
   session.setTimeout(config.sessionTimeoutSeconds * 1000)
@@ -53,17 +56,17 @@ server.on('connection', async (session) => {
   session.warn = (text) => ClientWarn(session.ip, text)
   session.errLog = (text) => ClientError(session.ip, text)
 
-  session.crypto = new Crypto(config.crypto.keys.key, config.crypto.keys.nonce)
+  session.crypto = config.crypto.activate ? new StreamEncrypter(config.crypto.type) : null
 
   session.id = getLastSessionId() + 1
 
-  session.queue = new Queue(config.maxQueueSize, config.disableQueuebugtxtFile)
+  session.queue = new Queue(config.queue.maxSize, config.disableQueuebugtxtFile)
 
   global.sessions.set(session.id, session)
 
   session.log(`A wild connection appeard! (SESSIONID: ${session.id})`)
   
-  const MessageHandler = new MessagesHandler(session, packets)
+  const MessageHandler = new MessagesHandler(session, Messages)
 
   session.on('data', async (bytes) => {
     let messageHeader = {}
@@ -72,9 +75,9 @@ server.on('connection', async (session) => {
 
     switch (session.queue.state) {
       case session.queue.QUEUE_OVERFILLED:
-        if (config.enableQueueOverfillingWarning) session.warn(`Queue is overfilled! Queue size: ${session.queue.size()}`)
+        if (config.queue.enableOverfillingWarning) session.warn(`Queue is overfilled! Queue size: ${session.queue.size()}`)
 
-        if (config.disconnectSessionOnQueueOverfilling) {
+        if (config.queue.disconnectSessionOnOverfilling) {
           return destroySession(session, "warn", "Client disconnected.")
         }
       break;
@@ -93,7 +96,7 @@ server.on('connection', async (session) => {
         session.log("Handling merged packets...")
         for(let packet of queueBytes) {
           if (config.crypto.activate) {
-            packet.bytes = session.crypto.decrypt(packet.bytes)
+            packet.bytes = session.crypto.decrypt(packet.id, packet.bytes)
           }
           
           await MessageHandler.handle(packet.id, packet.bytes, { })
@@ -110,11 +113,10 @@ server.on('connection', async (session) => {
       }
 
       if (config.crypto.activate) {
-        messageHeader.bytes = session.crypto.decrypt(messageHeader.bytes)
+        messageHeader.bytes = session.crypto.decrypt(messageHeader.id, messageHeader.bytes)
       }
   
       await MessageHandler.handle(messageHeader.id, messageHeader.bytes, {})
-
     }
   })
 
@@ -139,7 +141,24 @@ server.on('connection', async (session) => {
   })
 })
 
-server.once('listening', () => ServerLog(`${config.serverName} started on ${PORT} port!`))
+server.once('listening', () => {
+  ServerLog(`${config.serverName} started on ${PORT} port!`)
+  if (config.patcher.enabled) {
+    Patcher.start();
+  }
+
+  if (config.enableAdminConsole) {
+    rl.setPrompt("> ")
+    rl.prompt();
+
+    global.rl.on('close', () => {
+      Warn('Server stopped!');
+      server.close();
+      process.exit(0)
+    });
+  }
+})
+
 server.listen(PORT)
 
 process.on("uncaughtException", e => Warn(e.stack));

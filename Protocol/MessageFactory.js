@@ -1,52 +1,49 @@
-const fs = require('fs')
 const path = require("node:path")
 const glob = require("glob")
 
 const getDirectories = (src, callback) => glob(src + '/**/*', callback);
 
 class MessageFactory {
-  constructor (useLegacyPacketLoader) {
-    this.packets = {}
-    if (!useLegacyPacketLoader) { // Rewrited
-      getDirectories(path.join(__dirname, "Messages", "Client"), (err, res) => {
-        if (err) Err(err) // err
-        const files = res.filter(e => e.endsWith(".js"))
+  constructor () {
+    this.messages = {}
+    this.messagesList = []
 
-        for (const file of files) {
-          try{
-            const Packet = require("./" + path.relative(__dirname, file).replaceAll("\\", "/"))
-            const packetClass = new Packet()
+    getDirectories(path.join(__dirname, "Messages", "Client"), (err, res) => {
+      if (err) Err(err) // err
+      const files = res.filter(e => e.endsWith(".js"))
 
-            this.packets[packetClass.id] = Packet
-          }catch(err){
-            Err(`A wild error while initializing "${file.split("/").slice(-1)}" packet!`)
-            console.log(err)
-          }
+      for (const file of files) {
+        try{
+          const Message = require("./" + path.relative(__dirname, file).replaceAll("\\", "/"))
+          const MessageInstance = new Message()
+
+          this.messages[MessageInstance.id] = Message
+          this.messagesList.push(MessageInstance.id)
+        }catch(err){
+          Err(`A wild error while initializing "${file.split("/").slice(-1)}" message!`)
+          console.log(err)
         }
-      })
-    } else { // Legacy
-      fs.readdir(path.join(__dirname, "Messages", "Client"), (err, files) => {
-        if (err)console.log(err)
-        files.forEach(e => {
-          try{
-            const Packet = require(`./Messages/Client/${e.replace('.js', '')}`)
-            const packetClass = new Packet()
-
-            this.packets[packetClass.id] = Packet
-          }catch(err){
-            Err(`A wild error while initializing "${e.replace(".js", "")}" packet!`)
-            console.log(err)
-          }
-        })
-      })
-    }
+      }
+    })
   }
   /**
    * Get all packets
    * @returns { Object } Packets object
    */
-  getAllPackets () {
+  getAllMessages () {
     return this.packets
+  }
+
+  /**
+   * Get message class
+   * @param { Number } id Message ID
+   * @returns { Class } Message class
+   * @example
+   *   const NonExistMessage = MessageFactory.getMessage(1) // null
+   *   const ClientHelloMessage = MessageFactory.getMessage(10100) // ClientHelloMessage class
+   */
+  getMessage (id) {
+    return this.messagesList.includes(id) ? this.messages[id] : null
   }
 }
 

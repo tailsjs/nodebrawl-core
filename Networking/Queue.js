@@ -90,7 +90,7 @@ class Queue {
      * @param { Number } len Merged packet length
      * @returns { Boolean }
      */
-    unmerge (bytes, len) {
+    unmerge (bytes, len, unmergingTimes = 0) {
         if (bytes.length < 7) return false;
         const packetBytes = bytes.slice(len)
         const packetId = packetBytes.readUInt16BE(0)
@@ -99,7 +99,7 @@ class Queue {
         if (packetId < 10100 || packetId >= 20000) {
             if (!this.disableQueuebugtxtFile) {
                 Warn("Please, report queuebug.txt file to https://github.com/tailsjs/nodebrawl-core/issues/new")
-                require("fs").writeFileSync("./queuebug.txt", this.originalMerged)
+                require("fs").writeFileSync("./queuebug.txt", `Original Bytes: ${this.originalMerged}\n\n\nMerged Issue (${unmergingTimes}): ${packetBytes.slice(7).toString("hex").toUpperCase().match(/.{0,2}/g).filter(e => e != "").join("")}`)
                 Fatal("Server is off...")
             }
 
@@ -107,7 +107,8 @@ class Queue {
         }
 
         if (packetBytes.slice(7).length > newLength) {
-            this.unmerge(packetBytes.slice(7), newLength)
+            unmergingTimes++
+            this.unmerge(packetBytes.slice(7), newLength, unmergingTimes)
         }
 
         const header = {

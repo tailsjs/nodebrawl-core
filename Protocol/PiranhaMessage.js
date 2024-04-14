@@ -1,4 +1,5 @@
 const Messaging = require("../Networking/Messaging")
+const DataStream = require("../Titan/DataStream")
 
 /**
   * PiranhaMessage
@@ -15,26 +16,31 @@ class PiranhaMessage extends Messaging {
    */
   constructor (session) {
     super(session)
+    this.DataStream = DataStream
     /**
-     * Packet ID.
+     * Message ID.
+     * @type { Number } Message ID
      */
     this.id = 0
     /**
      * Session variable.
+     * @type { Session } User session
      */
-    this.session = null
+    this.session = session
     /**
-     * Packet version.
+     * Message version.
+     * @type { Number } Message version
      */
     this.version = 0
     /**
-     * ByteStream class.
+     * ByteStream class instance.
+     * @type { ByteStream } ByteStream class instance
      */
-    this.stream = null
+    this.stream = DataStream.getByteStream()
   }
 
   /**
-   * Encode function for server packets.
+   * Encode function for server messages.
    * 
    * Need to use `write` functions
    */
@@ -43,7 +49,7 @@ class PiranhaMessage extends Messaging {
   };
 
   /**
-   * Decode function for client packets.
+   * Decode function for client messages.
    * 
    * Need to use `read` functions
    */
@@ -52,7 +58,7 @@ class PiranhaMessage extends Messaging {
   };
 
   /**
-   * Process function for client packets.
+   * Process function for client messages.
    * 
    * Your code here.
    */

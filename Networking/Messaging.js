@@ -8,7 +8,7 @@ class Messaging {
      * 
      * @param { Session } session User session (`this.session`)
      */
-    constructor(session){
+    constructor (session) {
         this.session = session;
     }
 
@@ -21,7 +21,7 @@ class Messaging {
         this.encode()
 
         if (config.crypto.activate) {
-            this.stream.buffer = this.session.crypto.encrypt(this.stream.buffer)
+            this.stream.buffer = this.session.crypto.encrypt(this.id, this.stream.buffer)
         }
     
         const header = this.generateHeader(this.id, this.stream.buffer.length, this.version)

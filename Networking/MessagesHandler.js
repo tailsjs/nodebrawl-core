@@ -2,56 +2,40 @@ class MessagesHandler {
     /**
      * MessagesHandler
      * 
-     * Class for handling server packets
+     * Class for handling client packets
      * 
      * @param { Session } session User session (`this.session`)
-     * @param { Array } packets Server packets, that you got through `MessageFactory`
+     * @param { MessageFactory } MessageFactory MessageFactory class instance
      */
-    constructor(session, packets){
+    constructor (session, MessageFactory) {
         this.session = session
-        this.packets = packets
+        this.MessageFactory = MessageFactory
     }
 
     /**
-     * Handle packet
+     * Handle message
      * @param { Number } id Packet ID
      * @param { Buffer } bytes Packet bytes
      * @param { Object } args Some other args, if you want.
      */
-    async handle(id, bytes, args){
-        if(this.isPacketExists(id.toString())){
-            try{
-                const PacketHandler = this.getPacketHandler(id)
-                const packet = new PacketHandler(bytes, this.session, args)
+    async handle (id, bytes, args) {
+        const MessageHandler = this.MessageFactory.getMessage(id)
 
-                this.session.log(`Gotcha ${id} (${packet.constructor.name}) packet!`)
-
-                await packet.decode()
-                await packet.process()
-            } catch(e) {
-                console.log(e)
-            }
-        }else{
+        if (!MessageHandler) {
             this.session.log(`Gotcha undefined ${id} packet!`)
+            return
         }
-    }
 
-    /**
-     * Check if packet exists
-     * @param { Number } id Packet ID
-     * @returns { boolean } Is packet exists?
-     */
-    isPacketExists(id){
-        return Object.keys(this.packets).includes(id)
-    }
+        try {
+            const MessageInstance = new MessageHandler(bytes, this.session, args)
 
-    /**
-     * Get packet handler
-     * @param { Number } id Packet ID
-     * @returns { Class } Packet class 
-     */
-    getPacketHandler(id){
-        return this.packets[id]
+            this.session.log(`Gotcha ${id} (${MessageInstance.constructor.name}) packet!`)
+
+            await MessageInstance.decode()
+            await MessageInstance.process()
+        } catch(e) {
+            console.error(e)
+        }
     }
 }
 

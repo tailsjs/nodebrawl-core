@@ -1,5 +1,9 @@
 require("colors");
-const { enableLogs } = require("../config.json");
+const util = require("node:util");
+const { enableLogs, enableAdminConsole } = require("../config.json");
+if (enableAdminConsole) {
+    require("./AdminConsole")
+}
 
 const buildPrefix = (mainPrefix) => mainPrefix + " >> ".gray
 
@@ -11,30 +15,56 @@ const PREFIXES = {
     LOG: buildPrefix("[LOG]".green.bold),
 }
 
-const log = (text) => {
+const log = (...args) => {
     if (!enableLogs) return;
-    return console.log(text)
+    return logging(...args)
 }
 
+const logging = (...args) => {
+    if (enableAdminConsole) {
+        rl.pause();
+        console.log(...args);
+        rl.resume();
+    } else {
+        console.log(...args);
+    }
+}
+
+const prepareArgs = (...args) => {
+    const formattedArgs = args.map(arg => {
+        if (typeof arg === 'string') {
+            return arg.bold;
+        }
+
+        return util.inspect(arg, { colors: true });
+    });
+
+    return formattedArgs.join(" ");
+};
+
 // Server logs
-global.Log = (text) => console.log(PREFIXES.LOG + text.bold)
-global.Warn = (text) => console.log(PREFIXES.WARN + text.bold)
-global.Err = (text) => console.log(PREFIXES.ERROR + text.bold)
-global.ServerLog = (text) => console.log(PREFIXES.SERVER + text.bold)
-global.Fatal = (text) => {
-    console.error(PREFIXES.FATAL + text.bold)
+global.Log = (...args) => logging(PREFIXES.LOG + prepareArgs(...args))
+global.Warn = (...args) => logging(PREFIXES.WARN + prepareArgs(...args))
+global.Err = (...args) => logging(PREFIXES.ERROR + prepareArgs(...args))
+global.ServerLog = (...args) => logging(PREFIXES.SERVER + prepareArgs(...args))
+global.Fatal = (...args) => {
+    logging(PREFIXES.FATAL + prepareArgs(...args))
     return process.exit(1)
 }
 
 global.Debug = (text, showTime) => {
     const logLineDetails = ((new Error().stack).split("at ")[2]).trim();
 
-    const file = logLineDetails.split(" ")[1].split("\\").slice(-1)[0].replace(")", "");
+    let file = logLineDetails.split(" ")[1].split("\\").slice(-1)[0].replace(")", "");
 
-    log(buildPrefix(`[${file}]${showTime ? ` (${new Date().toUTCString()})` : ""}`.gray) + text.bold)
+    if (!file.includes(":")) {
+        file += ":" + logLineDetails.split(" ").slice(-1)[0].split(":").slice(-2).join(":").replace(")", "");
+    }
+
+    logging(buildPrefix(`[${file}]${showTime ? ` (${new Date().toUTCString()})` : ""}`.gray) + text.bold)
 }
 
 // Client logs
-global.Client = (ip, text) => log(buildPrefix(`[${ip}]`.green.bold) + text.bold)
-global.ClientWarn = (ip, text) => log(buildPrefix(`[${ip}]`.yellow.bold) + text.bold)
-global.ClientError = (ip, text) => log(buildPrefix(`[${ip}]`.red.bold) + text.bold)
+global.Client = (ip, ...args) => log(buildPrefix(`[${ip}]`.green.bold) + prepareArgs(...args))
+global.ClientWarn = (ip, ...args) => log(buildPrefix(`[${ip}]`.yellow.bold) + prepareArgs(...args))
+global.ClientError = (ip, ...args) => log(buildPrefix(`[${ip}]`.red.bold) + prepareArgs(...args))

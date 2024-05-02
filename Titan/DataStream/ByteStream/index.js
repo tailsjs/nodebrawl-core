@@ -1,3 +1,5 @@
+const ChecksumEncoder = require('../ChecksumEncoder')
+
 /**
   * ByteStream
   * 
@@ -5,9 +7,10 @@
   * 
   * @param { Buffer } bytes Bytes
   */
-class ByteStream {
+class ByteStream extends ChecksumEncoder {
   constructor (bytes = Buffer.alloc(0)) {
     // eslint-disable-next-line new-cap
+    super()
     this.buffer = bytes;
     this.length = 0
     this.offset = 0
@@ -61,6 +64,7 @@ class ByteStream {
    * @param {Number} value Your value to write.
    */
   writeShort (value) {
+    super.writeShort(value)
     this.bitOffset = 0
     this.ensureCapacity(2)
     this.buffer[this.offset++] = (value >> 8)
@@ -73,6 +77,7 @@ class ByteStream {
    * @param {Number} value Your value to write.
    */
   writeInt (value) {
+    super.writeInt(value)
     this.bitOffset = 0
     this.ensureCapacity(4)
     this.buffer[this.offset++] = (value >> 24)
@@ -150,6 +155,7 @@ class ByteStream {
    * @param {Number} value Your value to write.
    */
   writeVInt (value) {
+    super.writeVInt(value)
     this.bitOffset = 0
     let temp = (value >> 25) & 0x40
 
@@ -192,6 +198,7 @@ class ByteStream {
    * @param {Boolean} value Your value to write.
    */
   writeBoolean (value) {
+    super.writeBoolean(value)
     if (this.bitOffset === 0) {
       this.ensureCapacity(1)
       this.buffer[this.offset++] = 0
@@ -222,6 +229,7 @@ class ByteStream {
    * @param {String} value Your value to write.
    */
   writeString (value) {
+    super.writeString(value)
     if (value == null || value.length > 900001 || !value) {
       this.writeInt(-1)
       return
@@ -238,6 +246,7 @@ class ByteStream {
    * @param {String} value Your value to write.
    */
   writeStringReference (value) {
+    super.writeStringReference(value)
     if (value == null || value.length > 900001 || !value) {
       this.writeInt(0)
       return
@@ -279,6 +288,7 @@ class ByteStream {
    * @param {Number} value Your value to write.
    */
   writeLongLong (value) {
+    super.writeLongLong(value)
     this.writeInt(value >> 32)
     this.writeInt(value)
   }
@@ -307,6 +317,7 @@ class ByteStream {
    * @param {Number} value Your value to write.
    */
   writeByte (value) {
+    super.writeByte(value)
     this.bitOffset = 0
     this.ensureCapacity(1)
     this.buffer[this.offset++] = value
@@ -318,6 +329,8 @@ class ByteStream {
    */
   writeBytes (buffer) {
     const length = buffer.length
+
+    super.writeBytes(buffer, length)
 
     if (buffer != null) {
       this.writeInt(length)

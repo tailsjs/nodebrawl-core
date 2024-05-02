@@ -1,8 +1,30 @@
 {
     "port": 9339,
     "serverName": "Server",
-    "enableLogs": true,
-    "enableAdminConsole": true,
+    "disableQueuebugtxtFile": true,
+    "patcher": {
+        "enabled": true,
+        "port": 80
+    },
+    "queue": {
+        "maxSize": 1024,
+        "disconnectSessionOnOverfilling": true,
+        "enableOverfillingWarning": true
+    },
+    "session": {
+        "timeoutSeconds": 15,
+        "maxConnections": 100,
+        "maxConnectionsPerIP": 10
+    },
+    "logger": {
+        "enableServerLogs": true,
+        "enableClientLogs": true,
+        "enableAdminConsole": true,
+        "save": {
+            "enabled": true,
+            "path": "./logs/"
+        }
+    },
     "crypto": {
         "activate": false,
         "type": 0,
@@ -14,16 +36,5 @@
             "client_secret_key": "8434902B6A7D834C222FBEE06BE5950194B70D1B9F2DF140B4A36460900E032E",
             "server_public_key": "E230E00906463A4B041FD2F9B1D07B4910595EB60EEBF222C438D7A6B2094348"
         }
-    },
-    "patcher": {
-        "enabled": true,
-        "port": 80
-    },
-    "queue": {
-        "maxSize": 1024,
-        "disconnectSessionOnOverfilling": true,
-        "enableOverfillingWarning": true
-    },
-    "sessionTimeoutSeconds": 15,
-    "disableQueuebugtxtFile": true
+    }
 }

@@ -6,11 +6,18 @@ class ClientHelloMessage extends PiranhaMessage {
     super(session)
     this.id = 10100
     this.version = 0
-    this.stream = this.DataStream.getByteStream(bytes);
+    this.stream = this.DataStream.getByteStream(bytes)
   }
 
   async decode () {
-    this.stream.readInt()
+    this.protocol = this.stream.readInt()
+    this.keyVersion = this.stream.readInt()
+    this.major = this.stream.readInt()
+    this.minor = this.stream.readInt()
+    this.build = this.stream.readInt()
+    this.fingerprint = this.stream.readString()
+    this.deviceType = this.stream.readInt()
+    this.appStore = this.stream.readInt()
   }
 
   async process () {

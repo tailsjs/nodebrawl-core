@@ -44,13 +44,29 @@ const destroySession = (session, logType = "log", reason = "Client disconnected.
   clearSession(session.id)
 }
 
+const getAmountOfIPConnections = (ip) => {
+  let amount = 0
+
+  global.sessions.forEach(session => {
+    if (session.ip.split(":")[0] == ip) amount++
+  })
+
+  return amount
+}
+
 global.destroySession = destroySession
 
 server.on('connection', async (session) => {
-  session.setNoDelay(true)
-  session.setTimeout(config.sessionTimeoutSeconds * 1000)
+  const sessionIp = session.remoteAddress.split(':').slice(-1)
+  if (config.session.maxConnections != 0 && global.sessions.size >= config.session.maxConnections || 
+    config.session.maxConnectionsPerIP != 0 && getAmountOfIPConnections(sessionIp) >= config.session.maxConnectionsPerIP) {
+    return session.destroy()
+  }
 
-  session.ip = session.remoteAddress.split(':').slice(-1) + `:${session.remotePort}`;
+  session.setNoDelay(true)
+  session.setTimeout(config.session.timeoutSeconds * 1000)
+
+  session.ip = sessionIp + `:${session.remotePort}`;
 
   session.log = (text) => Client(session.ip, text)
   session.warn = (text) => ClientWarn(session.ip, text)

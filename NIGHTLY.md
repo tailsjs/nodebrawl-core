@@ -1,6 +1,32 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.05.02
+* Added `ChecksumEncoder`
+* Some changes in `config.json`
+* * Now `sessionTimeoutSeconds` in `session` object.
+* * `session` - Session settings
+* * `session.timeoutSeconds` - Maximum number of seconds of session inactivity. Default: `15`
+* * `session.maxConnections` - Maximum number of connections on one server. Default: `100`. You can disable it if value is `0`
+* * `session.maxConnectionsPerIP` - Maximum number of connections from one IP. Default: `10`
+* * Now `enableLogs` and `enableAdminConsole` in `logger` object
+* * `logger` - Logger settings
+* * `logger.enableServerLogs` - Enable server logs. Default: `true`
+* * `logger.enableClientLogs` - Enable client logs. Default: `true`
+* * `logger.enableAdminConsole` - Enable admin console. Default: `true`
+* * `logger.save` - Saving logs settings.
+* * `logger.save.enabled` - Enable logs savings. Default: `true`
+* * `logger.save.path` - Path to logs folder. Default: `./logs/`
+* `Messaging` class got new function `sendToAll`
+* `Messaging` functions got new arg, named `doNotEncrypt`
+* * It will send uncrypted packet, if you have enabled crypto.
+```js
+new ExampleMessage(this.session).send(true)
+new ExampleMessage(this.session).sendToSession(true)
+new ExampleMessage(this.session).sendToSessions(true)
+new ExampleMessage(this.session).sendToAll(true)
+```
+
 ### 2024.04.14
 * Biggest update ever.
 * Rewrited most of the core.
@@ -56,7 +82,7 @@ const ClientHelloMessage = Messages.getMessage(10100)
 // you got this
 ```
 * Rewrited `Crypto`
-* * Now it's named `StreamEncrypter` and it's very simple to use.
+* * Now it's named `StreamEncrypter` and it's very easy to use.
 * * Also added `Pepper` encryption.
 ```js
 const Encrypter = new StreamEncrypter(CRYPTO_TYPE) // 0 - RC4, 1 - Pepper
@@ -98,7 +124,7 @@ Queue state: 0
 [127.0.0.1:50267] >> Client manually was disconnected!
 [LOG] >> Session with ID 1 was disconnected!
 > someunused
-Command "someunused" is not defined!
+[WARNING] >> Command "someunused" is not defined!
 > exit
 [WARNING] >> Server is off...
 ```
@@ -150,7 +176,7 @@ getDefSkinById(1) // GunSlingerDefault
 
 ### 2024.02.05
 * Rewrited `sessions` system.
-* * Now it's using [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+* * Now it's using [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
 * * All destroy session logic now in `destroySession` function.
 ```js
 destroySession(session, "log", "Hey! I'm a session!")

@@ -6,7 +6,8 @@ const REASON_ENUMS = {
     MAINTENANCE: 10,
     BANNED: 11,
     PLAYED_TOO_MUCH: 12,
-    ACC_LOCKED: 13
+    ACC_LOCKED: 13,
+    LOCATION_RESTRICTED: 30
 }
 
 module.exports = REASON_ENUMS

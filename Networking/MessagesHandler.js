@@ -34,7 +34,7 @@ class MessagesHandler {
             await MessageInstance.decode()
             await MessageInstance.process()
         } catch(e) {
-            console.error(e)
+            this.session.errLog(e.stack)
         }
     }
 }

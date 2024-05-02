@@ -21,9 +21,11 @@ module.exports = class {
             this.nonce = input.nonce;
         }
     }
+
     bytes() {
         return this.nonce;
     }
+    
     increment() {
         let v8 = 2;
         let v10;

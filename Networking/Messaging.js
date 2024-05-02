@@ -14,32 +14,41 @@ class Messaging {
 
     /**
      * Send packet to user session.
+     * 
+     * @param { Boolean? } doNotEncrypt Skip packet encryption?
+     * 
+     * @example
+     * ```js
+     * new ExampleMessage(this.session).send()
+     * new ExampleMessage(this.session).send(true)
+     * ```
      */
-    send () {
+    send (doNotEncrypt) {
         if (this.id < 20000) return;
     
         this.encode()
 
-        if (config.crypto.activate) {
-            this.stream.buffer = this.session.crypto.encrypt(this.id, this.stream.buffer)
-        }
+        const buffer = config.crypto.activate && !doNotEncrypt ? this.session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
     
-        const header = this.generateHeader(this.id, this.stream.buffer.length, this.version)
+        const header = this.writeHeader(this.id, buffer.length, this.version)
 
-        this.session.write(Buffer.concat([header, this.stream.buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
+        this.session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
         this.session.log(`Packet ${this.id} (${this.constructor.name}) was sent.`)
     }
 
     /**
      * Send packet to another user session
+     * 
      * @param { Number } sessionId Session ID
+     * @param { Boolean? } doNotEncrypt Skip packet encryption?
      * 
      * @example
      * ```js
      *  new ExampleMessage(this.session).sendToSession(1)
+     *  new ExampleMessage(this.session).sendToSession(2, true)
      * ```
      */
-    sendToSession (sessionId) {
+    sendToSession (sessionId, doNotEncrypt) {
         if (this.id < 20000) return;
 
         this.encode()
@@ -48,22 +57,26 @@ class Messaging {
 
         if (!session) return;
 
-        const header = this.generateHeader(this.id, this.stream.buffer.length, this.version)
+        const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
 
-        session.write(Buffer.concat([header, this.stream.buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
+        const header = this.writeHeader(this.id, buffer.length, this.version)
+
+        session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
         session.log(`Packet ${this.id} (${this.constructor.name}) was sent to session with ID ${session.id}.`)
     }
 
     /**
      * Send packet to another users sessions
      * @param { Array } sessionIdArray Session ID Array
+     * @param { Boolean? } doNotEncrypt Skip packet encryption?
      * 
      * @example
      * ```js
-     *  new ExampleMessage(this.session).sendToSessions([ 1, 5 ])
+     *  new ExampleMessage(this.session).sendToSessions([ 2, 4 ])
+     *  new ExampleMessage(this.session).sendToSessions([ 1, 3, 5 ], true)
      * ```
      */
-    sendToSessions (sessionIdArray) {
+    sendToSessions (sessionIdArray, doNotEncrypt) {
         if (this.id < 20000) return;
 
         this.encode()
@@ -72,9 +85,35 @@ class Messaging {
 
         if (!selectedSessions) return;
 
-        const header = this.generateHeader(this.id, this.stream.buffer.length, this.version)
-        for (let session of selectedSessions) {
-            session.write(Buffer.concat([header, this.stream.buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
+        for (const session of selectedSessions) {
+            const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+
+            const header = this.writeHeader(this.id, buffer.length, this.version)
+            session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
+            session.log(`Packet ${this.id} (${this.constructor.name}) was sent to session with ID ${session.id}.`)
+        }
+    }
+
+    /**
+     * Send packet to all sessions
+     * 
+     * @param { Boolean? } doNotEncrypt Skip packet encryption?
+     * 
+     * @example
+     * ```js
+     *  new ExampleMessage(this.session).sendToAll()
+     *  new ExampleMessage(this.session).sendToAll(true)
+     * ```
+     */
+    sendToAll (doNotEncrypt) {
+        if (this.id < 20000) return;
+
+        this.encode()
+
+        for (const session of sessions) {
+            const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+            const header = this.writeHeader(this.id, buffer.length, this.version)
+            session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
             session.log(`Packet ${this.id} (${this.constructor.name}) was sent to session with ID ${session.id}.`)
         }
     }
@@ -86,7 +125,7 @@ class Messaging {
      * @param { Number } version Packet version
      * @returns { Buffer } Packet header
      */
-    generateHeader (id, length, version) {
+    writeHeader (id, length, version) {
         const header = Buffer.alloc(7)
 
         header.writeUInt16BE(id, 0)

@@ -19,22 +19,22 @@ class PiranhaMessage extends Messaging {
     this.DataStream = DataStream
     /**
      * Message ID.
-     * @type { Number } Message ID
+     * @type { Number } Message ID.
      */
     this.id = 0
     /**
      * Session variable.
-     * @type { Session } User session
+     * @type { Session } User session.
      */
     this.session = session
     /**
      * Message version.
-     * @type { Number } Message version
+     * @type { Number } Message version.
      */
     this.version = 0
     /**
      * ByteStream class instance.
-     * @type { ByteStream } ByteStream class instance
+     * @type { ByteStream } ByteStream class instance.
      */
     this.stream = DataStream.getByteStream()
   }

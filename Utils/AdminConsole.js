@@ -1,12 +1,21 @@
 const readline = require("node:readline")
+const { logger } = require("../config.json")
+const fs = require("node:fs")
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
+const buildFile = (file) => logger.save.path + file
+
 // Admin Console
 rl.on('line', async (input) => {
+    if (logger.save.enabled) {
+      const savePath = buildFile("server-logs.txt");
+
+      fs.appendFileSync(savePath, "> " + input + "\n");
+    }
     const command = input.trim().split(" ")[0];
 
     const args = input.trim().split(" ").slice(1).map(e => isNaN(e) ? e : Number(e));
@@ -32,11 +41,11 @@ rl.on('line', async (input) => {
 
         if (!sessionData) return Warn(`Session with ID ${args[0]} not found!`)
 
-        destroySession(sessionData, "warn", "Client manually was disconnected!")
+        destroySession(sessionData, "warn", "Client was disconnected through admin panel!")
         Log(`Session with ID ${args[0]} was disconnected!`)
       break;
       default:
-        Log(`Command "${command}" is not defined!`);
+        Warn(`Command "${command}" is not defined!`);
     }
   
     rl.prompt();

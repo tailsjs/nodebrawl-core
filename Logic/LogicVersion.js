@@ -8,15 +8,13 @@ class LogicVersion {
     static environment = SERVER_ENV_ENUM.DEV
 
     static getVersionString () {
-        return `${LogicVersion.major}.${LogicVersion.minor}.${LogicVersion.build}`
+        return [LogicVersion.major, LogicVersion.minor, LogicVersion.build].join(".")
     }
 
     static getServerEnv () {
-        return LogicVersion.isProd() ? "prod" : 
-            LogicVersion.isStage() ? "stage" :
-            LogicVersion.isIntegration() ? "integration" : 
-            LogicVersion.isDev() ? "dev" : 
-            "unknown"
+        const currentEnv = Object.keys(SERVER_ENV_ENUM).find(env => SERVER_ENV_ENUM[env] === this.environment)
+      
+        return currentEnv ? currentEnv.toLowerCase() : 'unknown'
     }
 
     static isProd = () => this.environment === SERVER_ENV_ENUM.PROD

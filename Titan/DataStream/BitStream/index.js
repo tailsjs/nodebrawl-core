@@ -110,12 +110,16 @@ class BitStream { // Still in beta.
     }
 
     writeBits (bits, count) {
-        let position = 0;
-        for (let i = 0; i < count;){ 
-            for (let p = 0; p < 8 && i < count; i++, p++) {
-                const value = ((bits[position++] >> p) & 1);
-                this.writeBit(value);
-            }
+        let sigma = 8; // const int
+        
+        let counter = 0;
+        let value = 0;
+
+        for (let i = 0; i < count; i++, counter++)
+        {
+            if (counter == 0) value = bits[i >> 3];
+            WriteBit((byte)((value >> (counter % sigma)) & 1));
+            if (counter == sigma - 1) counter = -1;
         }
     }
 

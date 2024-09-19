@@ -3,6 +3,7 @@ The world's first open source Brawl Stars private server core written on JavaScr
 *[Now uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Classes</a> instead of <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions">Functions!</a>]*
 
 * [Русский язык](/README-ru.md)
+* Try [nightly](https://github.com/tailsjs/nodebrawl-core/tree/nightly) version of core!
 
 ## Requirements
 * [NodeJS](https://nodejs.org/)

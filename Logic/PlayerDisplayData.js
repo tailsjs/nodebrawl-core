@@ -7,9 +7,7 @@ class PlayerDisplayData {
     namecolor = GlobalID.composeGlobalID(43, 0);
     isBrawlPassPurchased = false;
 
-    constructor (stream) {
-        this.decode(stream);
-    }
+    constructor () { }
 
     decode (stream) {
         this.name = stream.readString();

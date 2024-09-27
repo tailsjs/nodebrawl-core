@@ -33,6 +33,7 @@ class LogicCompressedString {
 
     /**
      * Decodes and decompress string from ByteStream
+     * 
      * @param { ByteStream } stream ByteStream class instance. In case, if instance is invalid, throws error
      */
     decode (stream) {

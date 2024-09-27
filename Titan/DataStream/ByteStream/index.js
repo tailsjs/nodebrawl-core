@@ -270,6 +270,14 @@ class ByteStream extends ChecksumEncoder {
   readStringReference (maxCapacity) {
     const length = this.readInt()
 
+    if (maxCapacity < 0) {
+      Warn("Negative String reference length encountered.")
+    }
+
+    if (length > maxCapacity) {
+      Warn("Too long String reference encountered, max", maxCapacity)
+    }
+
     if (length > 0 && length <= maxCapacity) {
       const stringBytes = this.buffer.slice(this.offset, this.offset + length)
       const string = stringBytes.toString('utf8')

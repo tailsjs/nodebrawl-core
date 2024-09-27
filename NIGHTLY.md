@@ -1,6 +1,76 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.09.27
+* `process` functions for client packets now named `execute`
+* New method of working with CSV Files
+* * New classes `ResourceManager`, `LogicResources`, `LogicDataTableResource`, `LogicDataTables`, `LogicDataTable`, `LogicData`, `CSVNode`, `CSVTable`, `CSVRow`, `CSVColumn`.. And many other
+* * For working with data, you need `LogicDataTables` class.
+```js
+const LogicDataTables = require("./Logic/Data/LogicDataTables")
+
+const ShotgunGirlData = LogicDataTables.getCharacterDataByIndex(0)
+
+ShotgunGirlData.isHero() // true
+```
+* * You can create your own methods.
+```js
+// LogicDataTables
+
+static getLocaleData () {
+  return LogicDataTables.tables[LogicDataType.LOCALES]
+}
+
+static getLocaleDataByIndex (index) {
+  return LogicDataTables.getLocaleData().items[index]
+}
+
+// LogicLocaleData
+const LogicVersion = require("../../LogicVersion")
+
+getLaserboxUrl () {
+  return LogicVersion.isStage() ? this.laserboxUrlStagingUrl : this.laserboxUrl
+}
+
+// SomeOtherNerdFile
+const LogicDataTables = require("./Logic/Data/LogicDataTables")
+
+const LocaleData = LogicDataTables.getLocaleDataByIndex(0)
+
+LocaleData.getLaserboxUrl() // https://inbox.brawlstars.com/
+```
+* * It means `CSVParser` is outdated and was removed.
+* Fixes in `ByteStream.readStringReference` and `ByteStream.writeStringReference`
+```js
+ByteStream.writeStringReference("is technically same") // but...
+
+const maxStringLength = 10
+ByteStream.readStringReference(maxStringLength) // you need to write here your own max string length
+```
+* Added `LogicRandom` and `LogicMersenneTwisterRandom` classes
+```js
+const LogicRandom = require("./Titan/Random/LogicRandom")
+const seed = 1488
+const random = new LogicRandom(seed)
+random.rand(98) // 21
+
+const LogicMersenneTwisterRandom = require("./Titan/Random/LogicMersenneTwisterRandom")
+const seed = 1488
+const random = new LogicMersenneTwisterRandom(seed)
+random.rand(98) // 94
+```
+* Now `MessageFactory` renamed to `LogicLaserMessageFactory`... and it's now static class.
+```js
+const LogicLaserMessageFactory = require("./Protocol/LogicLaserMessageFactory")
+
+LogicLaserMessageFactory.loadMessages()
+
+LogicLaserMessageFactory.createMessageByType(10100) // [class ClientHelloMessage extends PiranhaMessage]
+```
+* New `LogicConfig` class.
+* * It means, `config.json` file doesn't exists anymore. It was divided to 4 different files `config.{env}.json`
+* Small fixes
+
 ### 2024.05.02
 * Added `ChecksumEncoder`
 * Some changes in `config.json`

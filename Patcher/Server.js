@@ -5,7 +5,8 @@ const glob = require("glob")
 const fs = require("fs")
 const sha1 = require("js-sha1")
 const LogicVersion = require("../Logic/LogicVersion")
-const { patcher } = require("../config.json")
+const LogicConfig = require("../Logic/Server/LogicConfig")
+const { patcher } = LogicConfig
 
 const getDirectories = (src, callback) => glob(src + '/**/*', callback)
 const app = new Koa()
@@ -61,6 +62,8 @@ class Patcher {
                 const filePath = path.relative(dirName, file).replace("GameAssets\\", "").replaceAll("\\", "/")
 
                 this.files[filePath] = data.toString()
+
+                console.log(data)
                 this.fingerprint.files.push({
                     file: filePath.replaceAll("/", "\\/"),
                     sha: hash

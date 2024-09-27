@@ -1,5 +1,5 @@
 const RC4 = require('simple-rc4');
-const config = require("../../../config.json");
+const LogicConfig = require('../../../Logic/Server/LogicConfig');
 
 /**
  * RC4Encrypter.
@@ -8,8 +8,8 @@ const config = require("../../../config.json");
  */
 class RC4Encrypter {
   constructor () {
-      this.key = Buffer.from(config.crypto.rc4.key);
-      this.nonce = Buffer.from(config.crypto.rc4.nonce);
+      this.key = Buffer.from(LogicConfig.crypto.rc4.key);
+      this.nonce = Buffer.from(LogicConfig.crypto.rc4.nonce);
       this.encryptStream = new RC4(Buffer.concat([this.key, this.nonce]));
       this.encryptStream.update(Buffer.concat([this.key, this.nonce]));
       this.decryptStream =  new RC4(Buffer.concat([this.key, this.nonce]));

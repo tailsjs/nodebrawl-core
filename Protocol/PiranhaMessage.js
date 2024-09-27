@@ -58,11 +58,11 @@ class PiranhaMessage extends Messaging {
   };
 
   /**
-   * Process function for client messages.
+   * Execute function for client messages.
    * 
    * Your code here.
    */
-  process () {
+  execute () {
 
   }
 }

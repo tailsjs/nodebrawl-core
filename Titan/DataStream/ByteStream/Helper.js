@@ -24,7 +24,7 @@ class ByteStreamHelper {
     }
 
     /**
-     * Encoding Intenger Array to ByteStream
+    * Encoding Intener Array to ByteStream
      * @param { Array<Number> } array Array with ints
      * @example
      *   helper.encodeIntList([1, 2, 3, 4, 5])
@@ -40,7 +40,7 @@ class ByteStreamHelper {
     }
 
     /**
-     * Decoding Intenger Array from ByteStream
+     * Decoding Integer Array from ByteStream
      * @returns { Array<Number> } Array with ints
      * @example
      *   const intList = helper.decodeIntList()
@@ -58,7 +58,7 @@ class ByteStreamHelper {
     }
 
     /**
-     * Write Intenger Array to ByteStream
+     * Write Integer Array to ByteStream
      * @param { Array<Number> } array Array with ints
      */
     writeIntList (array) {
@@ -74,7 +74,7 @@ class ByteStreamHelper {
     }
 
     /**
-     * Read Intenger Array from ByteStream
+     * Read Integer Array from ByteStream
      * @param { Number } allowedMaxSize Max size of array
      * @returns { Array | Array<Number> } Array with ints
      */
@@ -194,6 +194,7 @@ class ByteStreamHelper {
             return [ ClassID, ClassID == 0 ? 0 : this.stream.readVInt() ]
         } else if (this.stream instanceof BitStream) {
             const ClassID = this.stream.readPositiveIntMax31()
+            return [ ClassID, ClassID == 0 ? 0 : this.stream.readPositiveIntMax511() ]
         }
     }
 
@@ -213,11 +214,14 @@ class ByteStreamHelper {
             ClassID = ClassID[0]
         }
 
-        if (ClassID < 1) {
-            this.stream.writeVInt(0)
-        } else {
-            this.stream.writeVInt(ClassID)
-            this.stream.writeVInt(InstanceID)
+        if (this.stream instanceof ByteStream) {
+            this.stream.writeVInt(ClassID < 1 ? 0 : ClassID)
+
+            if (ClassID > 0) this.stream.writeVInt(InstanceID)
+        } else if (this.stream instanceof BitStream) {
+            this.stream.writePositiveIntMax31(ClassID < 1 ? 0 : ClassID)
+               
+            if (ClassID > 0) this.stream.writePositiveIntMax511(InstanceID)
         }
     }
 

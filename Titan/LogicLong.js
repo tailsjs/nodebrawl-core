@@ -184,7 +184,7 @@ class LogicLong {
     }
 
     /**
-     * Set LogicLong intengers
+     * Set LogicLong integers
      * @param { Number } high Higher Int
      * @param { Number } low Lower Int
      * @example

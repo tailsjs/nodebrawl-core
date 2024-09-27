@@ -1,4 +1,4 @@
-const config = require("../config.json")
+const LogicConfig = require("../Logic/Server/LogicConfig");
 
 class Messaging {
     /**
@@ -23,12 +23,12 @@ class Messaging {
      * new ExampleMessage(this.session).send(true)
      * ```
      */
-    send (doNotEncrypt) {
+    async send (doNotEncrypt) {
         if (this.id < 20000) return;
     
-        this.encode()
+        await this.encode()
 
-        const buffer = config.crypto.activate && !doNotEncrypt ? this.session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+        const buffer = LogicConfig.crypto.activate && !doNotEncrypt ? this.session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
     
         const header = this.writeHeader(this.id, buffer.length, this.version)
 
@@ -48,16 +48,16 @@ class Messaging {
      *  new ExampleMessage(this.session).sendToSession(2, true)
      * ```
      */
-    sendToSession (sessionId, doNotEncrypt) {
+    async sendToSession (sessionId, doNotEncrypt) {
         if (this.id < 20000) return;
 
-        this.encode()
+        await this.encode()
 
         const session = sessions.find(session => session.id === sessionId)
 
         if (!session) return;
 
-        const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+        const buffer = LogicConfig.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
 
         const header = this.writeHeader(this.id, buffer.length, this.version)
 
@@ -76,17 +76,17 @@ class Messaging {
      *  new ExampleMessage(this.session).sendToSessions([ 1, 3, 5 ], true)
      * ```
      */
-    sendToSessions (sessionIdArray, doNotEncrypt) {
+    async sendToSessions (sessionIdArray, doNotEncrypt) {
         if (this.id < 20000) return;
 
-        this.encode()
+        await this.encode()
 
         const selectedSessions = sessions.filter(session => sessionIdArray.includes(session.id))
 
         if (!selectedSessions) return;
 
         for (const session of selectedSessions) {
-            const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+            const buffer = LogicConfig.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
 
             const header = this.writeHeader(this.id, buffer.length, this.version)
             session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
@@ -105,13 +105,13 @@ class Messaging {
      *  new ExampleMessage(this.session).sendToAll(true)
      * ```
      */
-    sendToAll (doNotEncrypt) {
+    async sendToAll (doNotEncrypt) {
         if (this.id < 20000) return;
 
-        this.encode()
+        await this.encode()
 
         for (const session of sessions) {
-            const buffer = config.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
+            const buffer = LogicConfig.crypto.activate && !doNotEncrypt ? session.crypto.encrypt(this.id, this.stream.buffer) : this.stream.buffer
             const header = this.writeHeader(this.id, buffer.length, this.version)
             session.write(Buffer.concat([header, buffer, Buffer.from([0xFF, 0xFF, 0x0, 0x0, 0x0, 0x0, 0x0])]))
             session.log(`Packet ${this.id} (${this.constructor.name}) was sent to session with ID ${session.id}.`)

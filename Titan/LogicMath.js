@@ -226,6 +226,18 @@ class LogicMath {
         return LogicMath.normalizeAngle360(360 - LogicMath.ATAN_TABLE[(num2 << 7) / num]);
     }
 
+    static getAngleBetween (angle1, angle2) {
+        return LogicMath.abs(LogicMath.normalizeAngle180(angle1 - angle2))
+    }
+
+    static getRotatedX (x, y, angle) {
+        return (x * LogicMath.cos(angle) - y * LogicMath.sin(angle)) / 1024
+    }
+
+    static getRotatedY (x, y, angle) {
+        return (x * LogicMath.sin(angle) - y * LogicMath.cos(angle)) / 1024
+    }
+
     static normalizeAngle180 (angle) {
         angle = LogicMath.normalizeAngle360(angle)
 

@@ -1,6 +1,7 @@
 const readline = require("node:readline")
-const { logger } = require("../config.json")
-const fs = require("node:fs")
+const LogicConfig = require("../Logic/Server/LogicConfig");
+const { logger } = LogicConfig
+const fs = require("node:fs");
 
 const rl = readline.createInterface({
     input: process.stdin,

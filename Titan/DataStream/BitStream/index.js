@@ -71,6 +71,11 @@ class BitStream { // Still in beta.
         return this.readPositiveInt(v2);
     }
 
+    readPositiveIntMax511 () {
+        const v2 = this.readPositiveInt(9);
+        return this.readPositiveInt(v2);
+    }
+
     /**
      * Read int from Bytes
      * @param { Number } bits Max amount of bits
@@ -126,6 +131,14 @@ class BitStream { // Still in beta.
         bytes[2] = value >> 16
         bytes[3] = value >> 24
         this.writeBits(bytes, bits);
+    }
+
+    writePositiveIntMax31 (value) {
+        this.writePositiveInt(value, 5)
+    }
+
+    writePositiveIntMax511 (value) {
+        this.writePositiveInt(value, 9)
     }
 
     writeInt (value, bits) {

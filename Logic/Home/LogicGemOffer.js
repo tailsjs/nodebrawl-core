@@ -7,9 +7,7 @@ class LogicGemOffer {
     hero = [16, 0];
     extraData = 0;
 
-    constructor (stream) {
-        this.decode(stream)
-    }
+    constructor () { }
 
     decode (stream) {
         const helper = new ByteStreamHelper(stream);
@@ -32,10 +30,6 @@ class LogicGemOffer {
     toString() {
         return `LogicGemOffer{type=${this.type}, count=${this.count}, hero=${GlobalID.composeGlobalID(this.hero)}, extraData=${this.extraData}}`
     }
-
-    static encode = this.encode
-    static decode = this.decode
-    static toString = this.toString
 }
 
 module.exports = LogicGemOffer

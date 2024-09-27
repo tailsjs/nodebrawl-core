@@ -2,9 +2,7 @@ class ProLeagueSeasonData {
     season = 0;
     trophies = 0;
 
-    constructor (stream) {
-        this.decode(stream);
-    }
+    constructor () { }
 
     decode (stream) {
         this.season = stream.readVInt();

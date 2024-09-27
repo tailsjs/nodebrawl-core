@@ -22,7 +22,7 @@ class ClientHelloMessage extends PiranhaMessage {
     this.stream.readInt()
   }
 
-  async process () {
+  async execute () {
     await new ServerHelloMessage(this.session).send()
   }
 }
@@ -95,7 +95,7 @@ this.stream.readBoolean()
 Читаем булевое значение. (1 байт)
 ##
 ```js
-async process() { ... }
+async execute () { ... }
 ```
 Вот тут вы пишете ваш код.
 ##

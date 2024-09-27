@@ -1,15 +1,10 @@
+const LogicConfig = require("../../../Logic/Server/LogicConfig");
 const Nacl = require("./Nacl"),
     Nonce = require("./Nonce"),
     {
         randomBytes
     } = require("crypto");
 
-const config = require("../../../config.json");
-
-const client_secret_key = new Uint8Array(Buffer.from(config.crypto.pepper.client_secret_key, "hex"));
-const client_public_key = new Uint8Array(32);
-Nacl.lowlevel.crypto_scalarmult_base(client_public_key, client_secret_key);
-const server_public_key = new Uint8Array(Buffer.from(config.crypto.pepper.server_public_key, "hex"));
 
 /**
  * PepperEncrypter.
@@ -18,7 +13,10 @@ const server_public_key = new Uint8Array(Buffer.from(config.crypto.pepper.server
  */
 class PepperEncrypter {
     constructor () {
-        this.client_public_key;
+        this.client_secret_key = new Uint8Array(Buffer.from(LogicConfig.crypto.pepper.client_secret_key, "hex"));
+        this.client_public_key = new Uint8Array(32);
+        Nacl.lowlevel.crypto_scalarmult_base(this.client_public_key, this.client_secret_key);
+        this.server_public_key = new Uint8Array(Buffer.from(LogicConfig.crypto.pepper.server_public_key, "hex"));
         this.client_nonce = new Nonce();
     }
 
@@ -33,11 +31,11 @@ class PepperEncrypter {
             return bytes;
         } else if (type == 10101) {
             bytes = bytes.slice(32);
-            this.key = Nacl.box.before(server_public_key, client_secret_key);
+            this.key = Nacl.box.before(this.server_public_key, this.client_secret_key);
             const nonce = new Nonce({
                 Keys: [
-                    client_public_key,
-                    server_public_key
+                    this.client_public_key,
+                    this.server_public_key
                 ]
             });
 
@@ -70,8 +68,8 @@ class PepperEncrypter {
             let nonce = new Nonce({
                 nonce: this.client_nonce.bytes(),
                 Keys: [
-                    client_public_key,
-                    server_public_key
+                    this.client_public_key,
+                    this.server_public_key
                 ]
             });
             this.server_nonce = new Nonce();

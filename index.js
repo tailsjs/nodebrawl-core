@@ -1,17 +1,19 @@
 const net = require('net') // Modules
-const config = require("./config.json")
 const StreamEncrypter = require("./Titan/Crypto")
-const MessageFactory = require('./Protocol/MessageFactory')
+const LogicLaserMessageFactory = require('./Protocol/LogicLaserMessageFactory')
 const MessagesHandler = require("./Networking/MessagesHandler")
 const Queue = require("./Networking/Queue")
 const PatcherServer = require("./Patcher/Server")
+const ResourceManager = require("./Titan/ResourceManager")
+const LogicConfig = require("./Logic/Server/LogicConfig")
+
+LogicConfig.loadConfig()
 require("./Utils/Logger");
 
 const server = new net.Server() // Class inits
-const Messages = new MessageFactory()
 const Patcher = new PatcherServer()
 
-const PORT = config.port
+const PORT = LogicConfig.port
 
 global.sessions = new Map(); // Sessions
 
@@ -56,15 +58,18 @@ const getAmountOfIPConnections = (ip) => {
 
 global.destroySession = destroySession
 
+ResourceManager.init()
+LogicLaserMessageFactory.loadMessages()
+
 server.on('connection', async (session) => {
   const sessionIp = session.remoteAddress.split(':').slice(-1)
-  if (config.session.maxConnections != 0 && global.sessions.size >= config.session.maxConnections || 
-    config.session.maxConnectionsPerIP != 0 && getAmountOfIPConnections(sessionIp) >= config.session.maxConnectionsPerIP) {
+  if (LogicConfig.session.maxConnections != 0 && global.sessions.size >= LogicConfig.session.maxConnections || 
+    LogicConfig.session.maxConnectionsPerIP != 0 && getAmountOfIPConnections(sessionIp) >= LogicConfig.session.maxConnectionsPerIP) {
     return session.destroy()
   }
 
   session.setNoDelay(true)
-  session.setTimeout(config.session.timeoutSeconds * 1000)
+  session.setTimeout(LogicConfig.session.timeoutSeconds * 1000)
 
   session.ip = sessionIp + `:${session.remotePort}`;
 
@@ -72,17 +77,17 @@ server.on('connection', async (session) => {
   session.warn = (text) => ClientWarn(session.ip, text)
   session.errLog = (text) => ClientError(session.ip, text)
 
-  session.crypto = config.crypto.activate ? new StreamEncrypter(config.crypto.type) : null
+  session.crypto = LogicConfig.crypto.activate ? new StreamEncrypter(LogicConfig.crypto.type) : null
 
   session.id = getLastSessionId() + 1
 
-  session.queue = new Queue(config.queue.maxSize, config.disableQueuebugtxtFile)
+  session.queue = new Queue(LogicConfig.queue.maxSize, LogicConfig.disableQueuebugtxtFile)
 
   global.sessions.set(session.id, session)
 
   session.log(`A wild connection appeard! (SESSIONID: ${session.id})`)
   
-  const MessageHandler = new MessagesHandler(session, Messages)
+  const MessageHandler = new MessagesHandler(session)
 
   session.on('data', async (bytes) => {
     let messageHeader = {}
@@ -91,9 +96,9 @@ server.on('connection', async (session) => {
 
     switch (session.queue.state) {
       case session.queue.QUEUE_OVERFILLED:
-        if (config.queue.enableOverfillingWarning) session.warn(`Queue is overfilled! Queue size: ${session.queue.size()}`)
+        if (LogicConfig.queue.enableOverfillingWarning) session.warn(`Queue is overfilled! Queue size: ${session.queue.size()}`)
 
-        if (config.queue.disconnectSessionOnOverfilling) {
+        if (LogicConfig.queue.disconnectSessionOnOverfilling) {
           return destroySession(session, "warn", "Client disconnected.")
         }
       break;
@@ -111,7 +116,7 @@ server.on('connection', async (session) => {
       if (Array.isArray(queueBytes)) {
         session.log("Handling merged packets...")
         for(let packet of queueBytes) {
-          if (config.crypto.activate) {
+          if (LogicConfig.crypto.activate) {
             packet.bytes = session.crypto.decrypt(packet.id, packet.bytes)
           }
           
@@ -128,7 +133,7 @@ server.on('connection', async (session) => {
         bytes: queueBytes.slice(7, messageHeader.len)
       }
 
-      if (config.crypto.activate) {
+      if (LogicConfig.crypto.activate) {
         messageHeader.bytes = session.crypto.decrypt(messageHeader.id, messageHeader.bytes)
       }
   
@@ -158,12 +163,12 @@ server.on('connection', async (session) => {
 })
 
 server.once('listening', () => {
-  ServerLog(`${config.serverName} started on ${PORT} port!`)
-  if (config.patcher.enabled) {
+  ServerLog(`${LogicConfig.serverName} started on ${PORT} port!`)
+  if (LogicConfig.patcher.enabled) {
     Patcher.start();
   }
 
-  if (config.enableAdminConsole) {
+  if (LogicConfig.logger.enableAdminConsole) {
     rl.setPrompt("> ")
     rl.prompt();
 

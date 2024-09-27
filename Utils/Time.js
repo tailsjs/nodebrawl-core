@@ -134,8 +134,6 @@ function difference(time, diffTime) {
     return time - diffTime
 }
 
-console.log(addToTime(60000, "5s"))
-
 module.exports = {
     parseTime,
     hasBeenPassed,

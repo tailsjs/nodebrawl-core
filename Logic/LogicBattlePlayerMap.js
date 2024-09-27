@@ -41,7 +41,7 @@ class LogicBattlePlayerMap {
         this.mapName = stream.readString();
         this.gameModeVariation = stream.readVInt();
         this.mapEnvironment = helper.readDataReference();
-        compressedString.decode(stream); // compressedString.string
+        compressedString.decode(stream);
         this.compressedMapData = compressedString.string;
 
         this.accountId = helper.decodeLogicLong()

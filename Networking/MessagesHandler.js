@@ -1,3 +1,5 @@
+const LogicLaserMessageFactory = require("../Protocol/LogicLaserMessageFactory")
+
 class MessagesHandler {
     /**
      * MessagesHandler
@@ -9,7 +11,6 @@ class MessagesHandler {
      */
     constructor (session, MessageFactory) {
         this.session = session
-        this.MessageFactory = MessageFactory
     }
 
     /**
@@ -19,7 +20,7 @@ class MessagesHandler {
      * @param { Object } args Some other args, if you want.
      */
     async handle (id, bytes, args) {
-        const MessageHandler = this.MessageFactory.getMessage(id)
+        const MessageHandler = LogicLaserMessageFactory.createMessageByType(id)
 
         if (!MessageHandler) {
             this.session.log(`Gotcha undefined ${id} packet!`)
@@ -32,7 +33,7 @@ class MessagesHandler {
             this.session.log(`Gotcha ${id} (${MessageInstance.constructor.name}) packet!`)
 
             await MessageInstance.decode()
-            await MessageInstance.process()
+            await MessageInstance.execute()
         } catch(e) {
             this.session.errLog(e.stack)
         }

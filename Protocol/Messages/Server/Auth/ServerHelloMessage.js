@@ -1,5 +1,6 @@
 const CRYPTO_TYPES = require('../../../../Titan/Enums/CryptoTypes')
 const PiranhaMessage = require('../../../PiranhaMessage')
+const { generateRandomBytes } = require('../../../../Utils/Random')
 
 class ServerHelloMessage extends PiranhaMessage {
   constructor (session) {
@@ -11,12 +12,13 @@ class ServerHelloMessage extends PiranhaMessage {
 
   async encode () {
     if (this.session.crypto === null || this.session.crypto.cryptoType !== CRYPTO_TYPES.PEPPER) {
-      this.stream.writeBytes(Buffer.from([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]))
+      this.stream.writeBytes(Buffer.alloc(24).map(() => 0x00))
       return
     }
 
-    const nonce = Buffer.from(this.session.crypto.crypto.client_nonce.bytes())
-    this.stream.writeBytes(nonce)
+    const randomBytes = generateRandomBytes(24)
+
+    this.stream.writeBytes(randomBytes)
   }
 }
 

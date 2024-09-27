@@ -1,7 +1,8 @@
 require("colors");
 const util = require("node:util");
-const fs = require("node:fs")
-const { logger } = require("../config.json");
+const fs = require("node:fs");
+const LogicConfig = require("../Logic/Server/LogicConfig");
+const { logger } = LogicConfig
 if (logger.enableAdminConsole) {
     require("./AdminConsole")
 }

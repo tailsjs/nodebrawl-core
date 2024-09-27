@@ -87,16 +87,8 @@ class ChecksumEncoder {
         }
 
         if (encoder != null) {
-            let checksum = encoder.checksum
-            let currentChecksum = this.checksum
-
-            if (!encoder.enabled) {
-                checksum = encoder.snapshotChecksum
-            }
-
-            if (!this.enabled) {
-                currentChecksum = this.snapshotChecksum
-            }
+            let checksum = encoder.enabled ? encoder.checksum : encoder.snapshotChecksum
+            let currentChecksum = this.enabled ? this.checksum : this.snapshotChecksum
 
             return checksum == currentChecksum
         }

@@ -18,8 +18,8 @@ class LogicUuid {
     }
 
     encode (stream) {
-        this.high = stream.readVInt()
-        this.low = stream.readVInt()
+        stream.writeVInt(this.high)
+        stream.writeVInt(this.low)
     }
 }
 

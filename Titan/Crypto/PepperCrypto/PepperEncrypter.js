@@ -64,7 +64,7 @@ class PepperEncrypter {
         if (type == 20100) {
             this.session_token = bytes.slice(4, 28);
             return bytes;
-        } else if ([29125, 20103].includes(type) && this.session_token != undefined) {
+        } else if ([ 20103, 20104 ].includes(type) && this.session_token != undefined) {
             let nonce = new Nonce({
                 nonce: this.client_nonce.bytes(),
                 Keys: [

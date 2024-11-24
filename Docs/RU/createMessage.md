@@ -131,7 +131,7 @@ class ServerHelloMessage extends PiranhaMessage {
     super(session)
     this.id = 20100
     this.version = 0
-    this.stream = this.DataStream.ByteStream()
+    this.stream = this.DataStream.getByteStream()
   }
 
   async encode () {

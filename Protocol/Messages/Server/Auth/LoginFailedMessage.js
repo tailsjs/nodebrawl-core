@@ -8,6 +8,7 @@ class LoginFailedMessage extends PiranhaMessage {
   updateUri = ""
   reason = ""
   maintenanceTime = 0
+  fingerprint = ""
 
   constructor (session) {
     super(session)
@@ -18,7 +19,7 @@ class LoginFailedMessage extends PiranhaMessage {
 
   async encode () {
     this.stream.writeInt(this.errorCode)
-    this.stream.writeString() // Finger
+    this.stream.writeString(this.fingerprint) // Finger
     this.stream.writeString(this.redirectUri)
     this.stream.writeString(this.contentUri)
     this.stream.writeString(this.updateUri)

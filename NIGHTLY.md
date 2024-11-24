@@ -1,6 +1,10 @@
 # Nightly Changelogs.
 * If you expirienced some bug, write about it in `Issues`
 
+### 2024.11.24
+* Small fixes
+* Fixed patcher
+
 ### 2024.09.27
 * `process` functions for client packets now named `execute`
 * New method of working with CSV Files

@@ -5,8 +5,6 @@ const BOOLEAN_VALUE_NOT_SET = 0x2
 const INT_VALUE_NOT_SET = 0x7FFFFFFF
 
 class CSVTable {
-    
-
     columnNameList = []
     columnList = []
     rowList = []

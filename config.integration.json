@@ -22,7 +22,7 @@
         "enableClientLogs": true,
         "enableAdminConsole": true,
         "save": {
-            "enabled": true,
+            "enabled": false,
             "path": "./logs/"
         }
     },

@@ -27,14 +27,15 @@ class ClientHelloMessage extends PiranhaMessage {
 
   async execute () {
     if (patcher.enabled && this.fingerprintSha != fingerprint.sha) {
-      const LoginFailed = await new LoginFailedMessage(this.session)
+      const LoginFailed = new LoginFailedMessage(this.session)
       LoginFailed.errorCode = LOGIN_FAILED_REASON.PATCH
       LoginFailed.contentUri = patcher.uri + (patcher.port != 80 ? ":" + patcher.port : "")
+      LoginFailed.fingerprint = JSON.stringify(fingerprint)
       return LoginFailed.send(true)
     }
 
     if (this.major != LogicVersion.major) {
-      const LoginFailed = await new LoginFailedMessage(this.session)
+      const LoginFailed = new LoginFailedMessage(this.session)
       LoginFailed.errorCode = LOGIN_FAILED_REASON.UPDATE
       LoginFailed.updateUri = "https://github.com/tailsjs/nodebrawl-core"
       LoginFailed.reason = "Update required to continue playing."

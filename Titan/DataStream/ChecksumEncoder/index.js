@@ -9,7 +9,7 @@ class ChecksumEncoder {
         this.enabled = true;
     }
 
-    enbaleChecksum (enable) {
+    enableChecksum (enable) {
         if (!this.enabled || enable) {
             if (!this.enabled && enable) {
                 this.checksum = this.snapshotChecksum

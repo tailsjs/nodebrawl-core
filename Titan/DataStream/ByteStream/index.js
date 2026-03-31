@@ -230,7 +230,7 @@ class ByteStream extends ChecksumEncoder {
    */
   writeString (value) {
     super.writeString(value)
-    if (value == null || value.length > 900001 || !value) {
+    if (value == null || value.length >= 900001 || !value) {
       this.writeInt(-1)
       return
     }
@@ -247,7 +247,7 @@ class ByteStream extends ChecksumEncoder {
    */
   writeStringReference (value) {
     super.writeStringReference(value)
-    if (value == null || value.length > 900001 || !value) {
+    if (value == null || value.length >= 900001 || !value) {
       this.writeInt(0)
       return
     }
